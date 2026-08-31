@@ -46,7 +46,42 @@ func WriteFile(payloadFS fs.FS, destDir, path string) error {
 		mode = 0o755
 	}
 
-	return os.WriteFile(destPath, content, mode)
+	return writeAtomic(destPath, content, mode)
+}
+
+// writeAtomic writes content to a temporary file in the same directory as
+// path, then renames it into place. Rename is atomic on POSIX filesystems,
+// so a process killed mid-write can never leave path holding truncated or
+// corrupted content: a reader always sees either the complete old content or
+// the complete new content, never something in between. Plain os.WriteFile
+// does not have this property.
+func writeAtomic(path string, content []byte, mode os.FileMode) (err error) {
+	dir := filepath.Dir(path)
+
+	tmp, err := os.CreateTemp(dir, ".harness-core-write-*")
+	if err != nil {
+		return err
+	}
+	tmpPath := tmp.Name()
+	defer func() {
+		if err != nil {
+			os.Remove(tmpPath)
+		}
+	}()
+
+	if _, err = tmp.Write(content); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err = tmp.Chmod(mode); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err = tmp.Close(); err != nil {
+		return err
+	}
+
+	return os.Rename(tmpPath, path)
 }
 
 // Init walks payloadFS and writes every file under destDir, preserving the

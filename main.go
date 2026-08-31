@@ -196,9 +196,13 @@ func runUpdate(args []string) {
 		return
 	}
 
-	if err := update.Apply(payloadFS, dest, plan); err != nil {
+	backupDir, err := update.Apply(payloadFS, dest, plan)
+	if err != nil {
 		fmt.Fprintln(os.Stderr, "harness-core update:", err)
 		os.Exit(1)
+	}
+	if backupDir != "" {
+		fmt.Println("backed up previous content to:", backupDir)
 	}
 
 	newProv, err := provenance.Compute(payloadFS, coreVersion)

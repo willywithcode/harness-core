@@ -18,6 +18,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"time"
 
 	"harness-core/internal/install"
 	"harness-core/internal/provenance"
@@ -183,17 +184,66 @@ func BuildPlan(payloadFS fs.FS, destDir string, prov provenance.Provenance) (Pla
 }
 
 // Apply writes every Add and Update item to destDir. It refuses to write
-// anything if the plan still contains unresolved conflicts.
-func Apply(payloadFS fs.FS, destDir string, plan Plan) error {
+// anything if the plan still contains unresolved conflicts. Before
+// overwriting any Update-category file, it snapshots that file's current
+// content under destDir/.harness-core/backup/<timestamp>/ so the consumer
+// can recover it by hand if the new upstream content turns out to be
+// unwanted. It returns that backup directory, or "" if nothing needed
+// backing up (an Add-only or no-op apply).
+func Apply(payloadFS fs.FS, destDir string, plan Plan) (backupDir string, err error) {
 	if conflicts := plan.Conflicts(); len(conflicts) > 0 {
-		return fmt.Errorf("%d conflict(s) require manual resolution before applying", len(conflicts))
+		return "", fmt.Errorf("%d conflict(s) require manual resolution before applying", len(conflicts))
 	}
 
-	for _, item := range plan.Actionable() {
+	actionable := plan.Actionable()
+
+	backupDir, err = backup(destDir, actionable)
+	if err != nil {
+		return "", fmt.Errorf("backing up before update: %w", err)
+	}
+
+	for _, item := range actionable {
 		if err := install.WriteFile(payloadFS, destDir, item.Path); err != nil {
-			return fmt.Errorf("writing %s: %w", item.Path, err)
+			return backupDir, fmt.Errorf("writing %s: %w", item.Path, err)
 		}
 	}
 
-	return nil
+	return backupDir, nil
+}
+
+// backup copies the current on-disk content of every Update-category item
+// (the ones about to be overwritten) into a fresh timestamped directory. Add
+// items have no prior content and are skipped. Returns "" without creating
+// anything if there is nothing to back up.
+func backup(destDir string, items []Item) (string, error) {
+	var toBackup []Item
+	for _, it := range items {
+		if it.Category == Update {
+			toBackup = append(toBackup, it)
+		}
+	}
+	if len(toBackup) == 0 {
+		return "", nil
+	}
+
+	stamp := time.Now().UTC().Format("20060102T150405Z")
+	backupDir := filepath.Join(destDir, ".harness-core", "backup", stamp)
+
+	for _, item := range toBackup {
+		src := filepath.Join(destDir, filepath.FromSlash(item.Path))
+		content, err := os.ReadFile(src)
+		if err != nil {
+			return "", fmt.Errorf("reading %s: %w", item.Path, err)
+		}
+
+		dst := filepath.Join(backupDir, filepath.FromSlash(item.Path))
+		if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
+			return "", err
+		}
+		if err := os.WriteFile(dst, content, 0o644); err != nil {
+			return "", fmt.Errorf("writing backup of %s: %w", item.Path, err)
+		}
+	}
+
+	return backupDir, nil
 }
