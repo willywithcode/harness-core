@@ -33,6 +33,21 @@ func Valid(name string) bool {
 	return valid[name]
 }
 
+// claudeMD is generated (never checked into git) for the "claude"/"both"
+// targets. Claude Code does not auto-load AGENTS.md the way it auto-loads
+// CLAUDE.md — a project with only AGENTS.md gets zero automatic instruction
+// loading. This file, plus its `@AGENTS.md` import, is the one-line bridge
+// that makes AGENTS.md actually take effect for Claude Code.
+const claudeMD = "# Project Rules\n" +
+	"\n" +
+	"## Harness\n" +
+	"\n" +
+	"Claude Code does not auto-load `AGENTS.md`. Import that single canonical\n" +
+	"project instruction source. Keep this bare `@` line outside backticks so the\n" +
+	"import remains active.\n" +
+	"\n" +
+	"@AGENTS.md\n"
+
 // executable lists the original .agents/skills/... paths that must be
 // written with the execute bit set, whichever target(s) they end up in.
 // go:embed does not preserve source file permissions, so this cannot be
@@ -48,14 +63,19 @@ var executable = map[string]bool{
 // embedded payload: AGENTS.md, docs/**, and .agents/skills/**).
 //
 //   - "agent": AGENTS.md, docs/**, and .agents/skills/** verbatim.
-//   - "claude": AGENTS.md, docs/**, and a self-contained .claude/skills/**
-//     tree. Every file under each skill is copied; in each skill's
-//     SKILL.md specifically, any text occurrence of ".agents/skills/" is
-//     rewritten to ".claude/skills/" so the skill's own references to its
-//     scripts and references still resolve even though .agents/ is never
-//     installed in this mode.
-//   - "both": AGENTS.md, docs/**, and both trees above, each
-//     self-contained.
+//   - "claude": AGENTS.md, docs/**, a self-contained .claude/skills/**
+//     tree, and a generated CLAUDE.md that imports AGENTS.md (Claude Code
+//     never reads AGENTS.md on its own). Every file under each skill is
+//     copied; in each skill's SKILL.md specifically, any text occurrence
+//     of ".agents/skills/" is rewritten to ".claude/skills/" so the
+//     skill's own references to its scripts and references still resolve
+//     even though .agents/ is never installed in this mode.
+//   - "both": AGENTS.md, docs/**, both skill trees above, and the same
+//     generated CLAUDE.md.
+//
+// init/update never overwrite an existing CLAUDE.md unless --override is
+// passed, same as any other file, so a consumer's own CLAUDE.md is left
+// alone.
 //
 // Build only reads rawPayload; it never touches disk.
 func Build(rawPayload fs.FS, name string) (fs.FS, error) {
@@ -105,6 +125,10 @@ func Build(rawPayload fs.FS, name string) (fs.FS, error) {
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if name == "claude" || name == "both" {
+		out["CLAUDE.md"] = &fstest.MapFile{Data: []byte(claudeMD), Mode: 0o644}
 	}
 
 	return out, nil

@@ -50,6 +50,7 @@ func TestBuild_Agent(t *testing.T) {
 	mustExist(t, out, ".agents/skills/demo-skill/SKILL.md")
 	mustExist(t, out, ".agents/skills/demo-skill/scripts/run.py")
 	mustNotExist(t, out, ".claude/skills/demo-skill/SKILL.md")
+	mustNotExist(t, out, "CLAUDE.md")
 
 	content := mustReadFile(t, out, ".agents/skills/demo-skill/SKILL.md")
 	if !strings.Contains(content, ".agents/skills/demo-skill/scripts/run.py") {
@@ -87,6 +88,11 @@ func TestBuild_Claude(t *testing.T) {
 	}
 
 	assertExecutable(t, out, ".claude/skills/demo-skill/scripts/run.py")
+
+	claudeMDContent := mustReadFile(t, out, "CLAUDE.md")
+	if !strings.Contains(claudeMDContent, "@AGENTS.md") {
+		t.Fatalf("CLAUDE.md must import AGENTS.md, got: %s", claudeMDContent)
+	}
 }
 
 func TestBuild_Both(t *testing.T) {
@@ -97,6 +103,7 @@ func TestBuild_Both(t *testing.T) {
 
 	mustExist(t, out, ".agents/skills/demo-skill/SKILL.md")
 	mustExist(t, out, ".claude/skills/demo-skill/SKILL.md")
+	mustExist(t, out, "CLAUDE.md")
 
 	agentContent := mustReadFile(t, out, ".agents/skills/demo-skill/SKILL.md")
 	if !strings.Contains(agentContent, ".agents/skills/demo-skill/scripts/run.py") {

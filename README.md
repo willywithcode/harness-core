@@ -47,8 +47,12 @@ unless `--override` is passed.
   exact path Claude Code's project skill discovery scans. Every file a
   skill needs (scripts, references) is copied alongside it, with internal
   references rewritten so the skill works with no `.agents/` directory
-  present at all.
-- `both` — both trees, each self-contained.
+  present at all. Also installs a `CLAUDE.md` that imports `AGENTS.md` —
+  Claude Code never reads `AGENTS.md` on its own, so without this it would
+  sit in the repo unread. If you already have a `CLAUDE.md`, it's left
+  untouched (same skip-if-exists rule as every other file); add `@AGENTS.md`
+  to it yourself in that case.
+- `both` — both skill trees, each self-contained, plus the same `CLAUDE.md`.
 
 ```bash
 harness-core init .
@@ -143,6 +147,12 @@ harness-core self-update
   path references to `.claude/skills/` — whenever `--target=claude` or
   `--target=both` is requested. `--target` decides which tree(s) actually
   land on disk; nothing about this lives as static files in git.
+- **Making AGENTS.md actually take effect for Claude Code**: Claude Code
+  only auto-loads `CLAUDE.md`/`CLAUDE.local.md` at session start — it never
+  reads `AGENTS.md` on its own. The `claude`/`both` targets also generate a
+  one-line `CLAUDE.md` (`@AGENTS.md`) so the payload isn't silently inert
+  for Claude Code users; it's skipped, like any other file, if one already
+  exists.
 - **Provenance**: every `init` and `update --apply` writes
   `.harness-core/provenance.json`: the installed core version, the target
   used, an install timestamp, and a SHA-256 hash per tracked file. This is
