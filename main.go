@@ -56,6 +56,8 @@ func main() {
 		runUpdate(os.Args[2:])
 	case "self-update":
 		runSelfUpdate(os.Args[2:])
+	case "help", "--help", "-h":
+		fmt.Print(helpText)
 	default:
 		usage()
 		os.Exit(1)
@@ -63,6 +65,11 @@ func main() {
 }
 
 func runInit(args []string) {
+	if hasHelp(args) {
+		fmt.Print(initHelp)
+		return
+	}
+
 	dest := "."
 	override := false
 	targetName := target.Default
@@ -119,6 +126,11 @@ func runInit(args []string) {
 }
 
 func runStatus(args []string) {
+	if hasHelp(args) {
+		fmt.Print(statusHelp)
+		return
+	}
+
 	dest := "."
 	if len(args) > 0 {
 		dest = args[0]
@@ -168,6 +180,11 @@ func runStatus(args []string) {
 }
 
 func runUpdate(args []string) {
+	if hasHelp(args) {
+		fmt.Print(updateHelp)
+		return
+	}
+
 	dest := "."
 	apply := false
 	targetFlag := ""
@@ -359,6 +376,11 @@ func printPlan(plan update.Plan) {
 }
 
 func runSelfUpdate(args []string) {
+	if hasHelp(args) {
+		fmt.Print(selfUpdateHelp)
+		return
+	}
+
 	checkOnly := false
 	for _, a := range args {
 		if a == "--check" {
@@ -399,8 +421,86 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "                           [--accept-upstream=<path>]... [--keep-local=<path>]...")
 	fmt.Fprintln(os.Stderr, "       mustang self-update [--check]")
 	fmt.Fprintln(os.Stderr, "")
-	fmt.Fprintln(os.Stderr, "--target selects which skill discovery format(s) to install:")
-	fmt.Fprintln(os.Stderr, "  agent  - .agents/skills/ only (vendor-neutral, other agent runtimes)")
-	fmt.Fprintln(os.Stderr, "  claude - .claude/skills/ only (Claude Code's native discovery path)")
-	fmt.Fprintln(os.Stderr, "  both   - both, self-contained (default)")
+	fmt.Fprintln(os.Stderr, "Run 'mustang --help' for details, or 'mustang <command> --help' for one command.")
 }
+
+// hasHelp reports whether args requests help, so every subcommand can bail
+// out to its own focused help text before doing any real work.
+func hasHelp(args []string) bool {
+	for _, a := range args {
+		if a == "--help" || a == "-h" {
+			return true
+		}
+	}
+	return false
+}
+
+const helpText = `mustang installs and maintains agent-facing guidance files (AGENTS.md,
+docs/, and skills) in any repository, as a single self-updating binary.
+
+Usage:
+  mustang init [dest] [--override] [--target=agent|claude|both]
+  mustang status [dest]
+  mustang update [dest] [--apply] [--target=agent|claude|both]
+                 [--accept-upstream=<path>]... [--keep-local=<path>]...
+  mustang self-update [--check]
+  mustang help | --help | -h
+
+Commands:
+  init         Install the payload into dest (default: current directory).
+  status       Compare files on disk against recorded provenance.
+  update       Reconcile local changes with the current embedded payload.
+  self-update  Replace this binary with the latest GitHub release.
+
+--target selects which skill discovery format(s) init/update use:
+  agent  - .agents/skills/ only (vendor-neutral, other agent runtimes)
+  claude - .claude/skills/ only (Claude Code's native discovery path)
+  both   - both, self-contained (default)
+
+Run 'mustang <command> --help' for one command's full details.
+`
+
+const initHelp = `mustang init [dest] [--override] [--target=agent|claude|both]
+
+Copies the payload into dest (default: current directory) and writes
+dest/.mustang/provenance.json: the installed core version, target, and a
+SHA-256 hash per file. An existing file is left untouched unless
+--override is passed.
+
+  --override         Overwrite files that already exist.
+  --target=<value>   agent, claude, or both (default: both).
+`
+
+const statusHelp = `mustang status [dest]
+
+Compares files on disk against the recorded provenance and reports which
+tracked files are unchanged, locally modified, or missing.
+`
+
+const updateHelp = `mustang update [dest] [--apply] [--target=agent|claude|both]
+               [--accept-upstream=<path>]... [--keep-local=<path>]...
+
+Compares BASE (provenance), LOCAL (disk), and UPSTREAM (the payload
+embedded in this binary) for every tracked file. Without --apply, only
+previews the plan; nothing is written.
+
+  --apply                    Write the previewed changes.
+  --target=<value>           Switch target: agent, claude, or both.
+  --accept-upstream=<path>   Resolve a conflict by taking the new
+                             upstream version (repeatable).
+  --keep-local=<path>        Resolve a conflict by keeping your local
+                             edit; permanent, not a one-time skip
+                             (repeatable).
+
+If any conflict remains unresolved, --apply refuses to write anything at
+all, including non-conflicting files.
+`
+
+const selfUpdateHelp = `mustang self-update [--check]
+
+Checks the latest GitHub release and, if newer, downloads the matching
+platform binary, verifies its SHA-256 checksum, and replaces the running
+executable in place.
+
+  --check   Report whether an update is available; download or write nothing.
+`

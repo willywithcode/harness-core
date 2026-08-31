@@ -142,6 +142,12 @@ mustang self-update --check
 mustang self-update
 ```
 
+### Help
+
+`mustang --help` (or `-h`, or `help`) prints the full command list.
+`mustang <command> --help` prints that one command's full details — e.g.
+`mustang update --help`.
+
 ## How it works
 
 - **Payload embedding**: `AGENTS.md`, `docs/`, and `.agents/skills/` — the
