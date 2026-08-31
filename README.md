@@ -76,7 +76,7 @@ modified: docs/patterns/encoding-invariants.md
 38 unchanged, 1 modified, 0 missing (of 39 tracked).
 ```
 
-### `harness-core update [dest] [--apply] [--target=agent|claude|both]`
+### `harness-core update [dest] [--apply] [--target=agent|claude|both] [--accept-upstream=<path>]... [--keep-local=<path>]...`
 
 Compares three versions of every payload file:
 
@@ -101,19 +101,31 @@ CONFLICT: docs/WORKFLOW.md (modified locally and changed upstream)
 
 23 up to date, 1 kept as local edits, 0 already match upstream, 0 locally deleted (upstream unchanged).
 
-1 conflict(s) found. Resolve them by hand (edit the local file to keep,
-accept, or merge the upstream change), then rerun `harness-core update`.
+1 conflict(s) found. Resolve them with --accept-upstream=<path> (take the new
+version, backing up the old one first), --keep-local=<path> (keep your edit
+and stop asking), or by hand (edit the local file to match either side), then
+rerun `harness-core update`.
 ```
 
 If there is any unresolved conflict, `--apply` refuses to write **anything**
-— not even the non-conflicting files — until you resolve it by hand and
-rerun. Once clean, `--apply` writes the changes and backs up every
-overwritten file's previous content to
-`dest/.harness-core/backup/<timestamp>/` first, so an unwanted upstream
-change can be recovered by hand.
+— not even the non-conflicting files. Resolve each one explicitly, per path:
+
+- `--accept-upstream=<path>` — take the new upstream content. The
+  overwritten local content is backed up to
+  `dest/.harness-core/backup/<timestamp>/` first, same as any other
+  overwrite.
+- `--keep-local=<path>` — keep your edit exactly as-is; nothing is written.
+  This is permanent, not a one-time skip: `update` won't ask about this
+  path again unless upstream changes it once more.
+
+Both flags can be repeated for multiple paths. A path that doesn't match a
+current conflict prints a warning and is otherwise ignored — it never
+silently no-ops your typo.
 
 ```bash
 harness-core update --apply
+harness-core update --accept-upstream=docs/WORKFLOW.md --apply
+harness-core update --keep-local=CLAUDE.md --apply
 ```
 
 ### `harness-core self-update [--check]`
