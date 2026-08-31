@@ -11,13 +11,20 @@ import (
 
 	"harness-core/internal/install"
 	"harness-core/internal/provenance"
+	"harness-core/internal/selfupdate"
 	"harness-core/internal/update"
 )
 
-// coreVersion identifies the payload this binary ships. Bump it by hand
-// whenever AGENTS.md, docs/, or .agents/ change in a way consumers should be
-// able to detect via `harness-core status` (and, later, `update`).
-const coreVersion = "0.1.0"
+// coreVersion identifies the payload (and binary) this build ships. The
+// release workflow overrides it via `-ldflags "-X main.coreVersion=<tag>"`
+// so a released binary's reported version always matches its git tag
+// exactly. A local `go build`/`go run` without that flag falls back to this
+// placeholder, which intentionally never matches a real release tag.
+var coreVersion = "0.0.0-dev"
+
+// selfUpdateRepo is the GitHub "owner/repo" that hosts harness-core
+// releases.
+const selfUpdateRepo = "willywithcode/harness-core"
 
 // Payload embeds the exact files this CLI ships into a consumer repository.
 // docs/ and .agents/ already contain only the curated payload subset; the
@@ -42,6 +49,8 @@ func main() {
 		runStatus(os.Args[2:])
 	case "update":
 		runUpdate(os.Args[2:])
+	case "self-update":
+		runSelfUpdate(os.Args[2:])
 	default:
 		usage()
 		os.Exit(1)
@@ -244,8 +253,43 @@ func printPlan(plan update.Plan) {
 		upToDate, keptLocal, adopted, locallyDeleted)
 }
 
+func runSelfUpdate(args []string) {
+	checkOnly := false
+	for _, a := range args {
+		if a == "--check" {
+			checkOnly = true
+		}
+	}
+
+	client := selfupdate.NewClient(selfUpdateRepo)
+
+	plan, err := client.Plan(coreVersion)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "harness-core self-update: checking latest release:", err)
+		os.Exit(1)
+	}
+
+	if plan.UpToDate {
+		fmt.Println("already up to date: core version", coreVersion)
+		return
+	}
+
+	fmt.Printf("update available: %s -> %s (%s)\n", plan.CurrentVersion, plan.LatestVersion, plan.AssetName)
+	if checkOnly {
+		return
+	}
+
+	if err := client.Apply(plan); err != nil {
+		fmt.Fprintln(os.Stderr, "harness-core self-update:", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("updated to core version %s. Rerun the command to use the new binary.\n", plan.LatestVersion)
+}
+
 func usage() {
 	fmt.Fprintln(os.Stderr, "usage: harness-core init [dest] [--override]")
 	fmt.Fprintln(os.Stderr, "       harness-core status [dest]")
 	fmt.Fprintln(os.Stderr, "       harness-core update [dest] [--apply]")
+	fmt.Fprintln(os.Stderr, "       harness-core self-update [--check]")
 }
