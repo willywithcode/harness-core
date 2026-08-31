@@ -52,7 +52,7 @@ exposed it:
 - **Proof:** checks established a proxy rather than the accepted outcome.
 - **Environment:** an external prerequisite was unavailable.
 
-Assign the correction to `repository-harness`, the consumer repository, the
+Assign the correction to `harness-core`, the consumer repository, the
 external environment, or a human decision. Do not copy consumer commands or
 policy into a generic upstream template.
 

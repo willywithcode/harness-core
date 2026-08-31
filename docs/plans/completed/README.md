@@ -7,7 +7,4 @@ current independent audience. Ordinary work should rely on code, tests,
 decisions, pull requests, and Git history instead of accumulating permanent
 task narratives.
 
-## Retained Transition Plans
-
-- `repository-protocol-core.md`: the atomic Protocol v1 EOL cut, legacy-data
-  preservation boundary, validation evidence, and recovery path.
+No plan is currently retained here.
