@@ -27,13 +27,24 @@ var coreVersion = "0.0.0-dev"
 const selfUpdateRepo = "willywithcode/harness-core"
 
 // Payload embeds the exact files this CLI ships into a consumer repository.
-// docs/ and .agents/ already contain only the curated payload subset; the
-// "all:" prefix is required so embed does not silently skip .agents (it
-// begins with a dot, which embed excludes by default).
+// docs/, .agents/, and .claude/ already contain only the curated payload
+// subset; the "all:" prefix is required so embed does not silently skip
+// .agents and .claude (both begin with a dot, which embed excludes by
+// default).
+//
+// .claude/skills/ holds thin pointer files only: Claude Code's project
+// skill discovery scans exactly .claude/skills/<name>/SKILL.md and has no
+// knowledge of .agents/skills/, so a skill living only under .agents/ is
+// invisible to Claude Code even though its content is the canonical,
+// vendor-neutral Agent Skills definition every runtime should read. Each
+// pointer's frontmatter matches its real .agents/skills/<name>/SKILL.md
+// exactly, so Claude Code's auto-invocation matches on the same
+// description; its body just tells the agent to go read the real file.
 //
 //go:embed AGENTS.md
 //go:embed docs
 //go:embed all:.agents
+//go:embed all:.claude
 var payload embed.FS
 
 func main() {

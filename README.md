@@ -1,8 +1,9 @@
 # harness-core
 
 `harness-core` installs and maintains a small set of agent-facing guidance
-files (`AGENTS.md`, `docs/`, `.agents/skills/`) in any repository, as a
-single self-updating binary with no runtime dependencies.
+files (`AGENTS.md`, `docs/`, `.agents/skills/`, plus Claude Code discovery
+pointers under `.claude/skills/`) in any repository, as a single
+self-updating binary with no runtime dependencies.
 
 It never merges. A file you never touched gets updated safely; a file you
 edited is left alone — unless upstream changed it too, in which case it
@@ -107,10 +108,18 @@ harness-core self-update
 
 ## How it works
 
-- **Payload embedding**: `AGENTS.md`, `docs/`, and `.agents/` are embedded
-  into the binary at compile time via Go's `//go:embed`. There is no network
-  call, config file, or external dependency involved in `init` — the payload
-  ships inside the executable itself.
+- **Payload embedding**: `AGENTS.md`, `docs/`, `.agents/`, and `.claude/` are
+  embedded into the binary at compile time via Go's `//go:embed`. There is
+  no network call, config file, or external dependency involved in `init` —
+  the payload ships inside the executable itself.
+- **Claude Code skill discovery**: the canonical skill definitions live
+  under `.agents/skills/<name>/SKILL.md` (a vendor-neutral format other
+  agent runtimes can read too), but Claude Code's project skill discovery
+  scans exactly `.claude/skills/<name>/SKILL.md` and has no knowledge of
+  `.agents/`. `init` also installs a thin pointer file at
+  `.claude/skills/<name>/SKILL.md` for each skill — same frontmatter, so
+  Claude Code's auto-invocation matches on the same description, with a
+  one-line body pointing at the real file under `.agents/skills/`.
 - **Provenance**: every `init` and `update --apply` writes
   `.harness-core/provenance.json`: the installed core version, an install
   timestamp, and a SHA-256 hash per tracked file. This is the only state
@@ -146,7 +155,8 @@ internal/install/             writes payload files (used by init and update)
 internal/provenance/          hashing, provenance.json read/write
 internal/update/              three-way BASE/LOCAL/UPSTREAM plan + apply
 internal/selfupdate/          GitHub release resolution, checksum verify, binary replace
-AGENTS.md, docs/, .agents/    the payload itself (also what init installs)
+AGENTS.md, docs/, .agents/,
+.claude/                      the payload itself (also what init installs)
 scripts/install.sh, .ps1      bootstrap installers
 .github/workflows/release.yml cross-platform release build
 ```
@@ -165,8 +175,10 @@ git push origin v0.2.0
 
 ## Updating the payload itself
 
-`AGENTS.md`, `docs/`, and `.agents/skills/` at the repository root are both
-this project's own working payload *and* the exact content `init` embeds and
-ships. Edit them like any other tracked files, then cut a release — every
-installed `harness-core` binary out there will pick up the change via
+`AGENTS.md`, `docs/`, `.agents/skills/`, and `.claude/skills/` at the
+repository root are both this project's own working payload *and* the exact
+content `init` embeds and ships. Edit them like any other tracked files —
+if you add or rename a skill under `.agents/skills/`, add its matching
+pointer under `.claude/skills/` too — then cut a release — every installed
+`harness-core` binary out there will pick up the change via
 `harness-core update`.
