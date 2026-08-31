@@ -1,7 +1,7 @@
-// Package install copies the embedded Harness payload into a consumer
-// repository. This is the stage-1 "copy-on-install" behavior: no merge
-// logic here. An existing file is left untouched unless override is set.
-// WriteFile is also reused by the update package to apply individual
+// Package install copies a materialized payload (see internal/target) into
+// a consumer repository. This is the stage-1 "copy-on-install" behavior: no
+// merge logic here. An existing file is left untouched unless override is
+// set. WriteFile is also reused by the update package to apply individual
 // files once a three-way plan says it is safe to do so.
 package install
 
@@ -17,18 +17,14 @@ type Result struct {
 	Skipped []string
 }
 
-// Executable lists payload paths that must be written with the execute bit
-// set. go:embed does not preserve source file permissions, so this cannot be
-// read from the embedded FS itself and must be kept in sync with the actual
-// git file mode (100755) of the payload manifest by hand.
-var Executable = map[string]bool{
-	".agents/skills/onboard-repository/scripts/emit_evidence_bundle.py": true,
-	".agents/skills/onboard-repository/scripts/render_patch.py":         true,
-}
-
 // WriteFile copies one payload file to destDir/path, creating parent
-// directories as needed and preserving the execute bit for paths listed in
-// Executable.
+// directories as needed and preserving the execute bit reported by
+// payloadFS. Callers must pass an fs.FS whose Mode() bits are trustworthy —
+// notably NOT a raw go:embed embed.FS, which always reports files as
+// non-executable regardless of their source permissions. internal/target's
+// Build output is backed by testing/fstest.MapFS, which does report the
+// mode it was given, so this works correctly for the FS this package is
+// actually called with.
 func WriteFile(payloadFS fs.FS, destDir, path string) error {
 	destPath := filepath.Join(destDir, filepath.FromSlash(path))
 
@@ -42,7 +38,7 @@ func WriteFile(payloadFS fs.FS, destDir, path string) error {
 	}
 
 	mode := os.FileMode(0o644)
-	if Executable[path] {
+	if info, statErr := fs.Stat(payloadFS, path); statErr == nil && info.Mode()&0o111 != 0 {
 		mode = 0o755
 	}
 

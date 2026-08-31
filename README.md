@@ -1,9 +1,8 @@
 # harness-core
 
 `harness-core` installs and maintains a small set of agent-facing guidance
-files (`AGENTS.md`, `docs/`, `.agents/skills/`, plus Claude Code discovery
-pointers under `.claude/skills/`) in any repository, as a single
-self-updating binary with no runtime dependencies.
+files (`AGENTS.md`, `docs/`, and a set of skills) in any repository, as a
+single self-updating binary with no runtime dependencies.
 
 It never merges. A file you never touched gets updated safely; a file you
 edited is left alone — unless upstream changed it too, in which case it
@@ -32,16 +31,29 @@ if you'd rather skip the script.
 
 ## Usage
 
-### `harness-core init [dest] [--override]`
+### `harness-core init [dest] [--override] [--target=agent|claude|both]`
 
-Copies the embedded payload into `dest` (default: current directory) and
-writes `dest/.harness-core/provenance.json`, recording the installed core
-version and a SHA-256 hash per file. An existing file is left untouched
+Copies the payload into `dest` (default: current directory) and writes
+`dest/.harness-core/provenance.json`, recording the installed core version,
+target, and a SHA-256 hash per file. An existing file is left untouched
 unless `--override` is passed.
+
+`--target` picks which skill discovery format(s) to install (default `both`):
+
+- `agent` — `.agents/skills/<name>/SKILL.md`, the vendor-neutral
+  [Agent Skills](https://agentskills.io) format other agent runtimes can
+  read directly.
+- `claude` — a self-contained `.claude/skills/<name>/SKILL.md` tree, the
+  exact path Claude Code's project skill discovery scans. Every file a
+  skill needs (scripts, references) is copied alongside it, with internal
+  references rewritten so the skill works with no `.agents/` directory
+  present at all.
+- `both` — both trees, each self-contained.
 
 ```bash
 harness-core init .
 harness-core init ../some-other-repo --override
+harness-core init ../claude-only-repo --target=claude
 ```
 
 ### `harness-core status [dest]`
@@ -52,20 +64,26 @@ tracked files are unchanged, locally modified, or missing.
 ```bash
 $ harness-core status
 core version: 0.1.0
+target: both
 installed at: 2026-08-31T09:18:46Z
 
 modified: docs/patterns/encoding-invariants.md
 
-25 unchanged, 1 modified, 0 missing (of 26 tracked).
+38 unchanged, 1 modified, 0 missing (of 39 tracked).
 ```
 
-### `harness-core update [dest] [--apply]`
+### `harness-core update [dest] [--apply] [--target=agent|claude|both]`
 
 Compares three versions of every payload file:
 
 - **BASE** — what provenance recorded at install time;
 - **LOCAL** — what's actually on disk now;
-- **UPSTREAM** — the payload embedded in the binary you're currently running.
+- **UPSTREAM** — the payload embedded in the binary you're currently running,
+  built for the effective target: the target from provenance, or `--target`
+  if you pass one to switch (e.g. `harness-core update --target=both --apply`
+  adds `.claude/skills/` to an existing `agent`-only install; switching away
+  from a target reports its files as "upstream removed" and leaves them on
+  disk, untracked, rather than deleting them).
 
 A file you never touched is safely overwritten when upstream changed it. A
 file upstream never changed is left alone even if you edited it. A file
@@ -108,22 +126,27 @@ harness-core self-update
 
 ## How it works
 
-- **Payload embedding**: `AGENTS.md`, `docs/`, `.agents/`, and `.claude/` are
-  embedded into the binary at compile time via Go's `//go:embed`. There is
-  no network call, config file, or external dependency involved in `init` —
-  the payload ships inside the executable itself.
-- **Claude Code skill discovery**: the canonical skill definitions live
-  under `.agents/skills/<name>/SKILL.md` (a vendor-neutral format other
-  agent runtimes can read too), but Claude Code's project skill discovery
-  scans exactly `.claude/skills/<name>/SKILL.md` and has no knowledge of
-  `.agents/`. `init` also installs a thin pointer file at
-  `.claude/skills/<name>/SKILL.md` for each skill — same frontmatter, so
-  Claude Code's auto-invocation matches on the same description, with a
-  one-line body pointing at the real file under `.agents/skills/`.
+- **Payload embedding**: `AGENTS.md`, `docs/`, and `.agents/skills/` — the
+  single canonical payload — are embedded into the binary at compile time
+  via Go's `//go:embed`. There is no network call, config file, or external
+  dependency involved in `init` — the payload ships inside the executable
+  itself.
+- **Generated, not duplicated, Claude Code discovery**: only
+  `.agents/skills/<name>/SKILL.md` (the vendor-neutral
+  [Agent Skills](https://agentskills.io) format) is checked into this repo.
+  Claude Code's project skill discovery, however, scans exactly
+  `.claude/skills/<name>/SKILL.md` and has no knowledge of `.agents/` at
+  all. Rather than hand-maintaining a second copy of every skill,
+  `internal/target.Build` derives a full, self-contained `.claude/skills/`
+  tree at install time — copying every file a skill needs (scripts,
+  references) and rewriting the skill's own internal `.agents/skills/`
+  path references to `.claude/skills/` — whenever `--target=claude` or
+  `--target=both` is requested. `--target` decides which tree(s) actually
+  land on disk; nothing about this lives as static files in git.
 - **Provenance**: every `init` and `update --apply` writes
-  `.harness-core/provenance.json`: the installed core version, an install
-  timestamp, and a SHA-256 hash per tracked file. This is the only state
-  `update`'s three-way comparison needs.
+  `.harness-core/provenance.json`: the installed core version, the target
+  used, an install timestamp, and a SHA-256 hash per tracked file. This is
+  the only state `update`'s three-way comparison needs.
 - **Copy-on-conflict, never merge**: `update` will never attempt to combine
   two versions of a file. A real conflict always stops and asks a human to
   resolve it — matching the upstream Harness project's own position that
@@ -143,7 +166,7 @@ Requires Go 1.22+.
 ```bash
 go build ./...        # build
 go vet ./...           # static checks
-go test ./...           # unit tests (selfupdate package)
+go test ./...           # unit tests (target and selfupdate packages)
 go run . init /tmp/test # try it locally without installing
 ```
 
@@ -151,12 +174,12 @@ go run . init /tmp/test # try it locally without installing
 
 ```
 main.go                       CLI entry point and subcommand dispatch
-internal/install/             writes payload files (used by init and update)
+internal/target/              derives the agent/claude/both file set from the raw payload
+internal/install/             writes files (used by init and update)
 internal/provenance/          hashing, provenance.json read/write
 internal/update/              three-way BASE/LOCAL/UPSTREAM plan + apply
 internal/selfupdate/          GitHub release resolution, checksum verify, binary replace
-AGENTS.md, docs/, .agents/,
-.claude/                      the payload itself (also what init installs)
+AGENTS.md, docs/, .agents/    the canonical payload (also what init installs)
 scripts/install.sh, .ps1      bootstrap installers
 .github/workflows/release.yml cross-platform release build
 ```
@@ -175,10 +198,11 @@ git push origin v0.2.0
 
 ## Updating the payload itself
 
-`AGENTS.md`, `docs/`, `.agents/skills/`, and `.claude/skills/` at the
-repository root are both this project's own working payload *and* the exact
-content `init` embeds and ships. Edit them like any other tracked files —
-if you add or rename a skill under `.agents/skills/`, add its matching
-pointer under `.claude/skills/` too — then cut a release — every installed
-`harness-core` binary out there will pick up the change via
-`harness-core update`.
+`AGENTS.md`, `docs/`, and `.agents/skills/` at the repository root are both
+this project's own working payload *and* the exact content `init` embeds
+and ships. Edit them like any other tracked files, then cut a release —
+every installed `harness-core` binary out there will pick up the change via
+`harness-core update`. There is nothing to keep in sync by hand for Claude
+Code: `.claude/skills/` is always derived from `.agents/skills/` at install
+time (see `internal/target`), so adding, renaming, or editing a skill only
+ever means touching its one file under `.agents/skills/`.

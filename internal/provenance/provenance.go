@@ -19,6 +19,7 @@ const RelPath = ".harness-core/provenance.json"
 // Provenance is the durable record written after a successful install.
 type Provenance struct {
 	CoreVersion string            `json:"core_version"`
+	Target      string            `json:"target"` // "agent", "claude", or "both"
 	InstalledAt time.Time         `json:"installed_at"`
 	Files       map[string]string `json:"files"` // relative path -> "sha256:<hex>"
 }
@@ -51,9 +52,10 @@ func HashAll(payloadFS fs.FS) (map[string]string, error) {
 }
 
 // Compute hashes every file in payloadFS and returns a fresh Provenance for
-// the given core version. Call this against the exact payload that was just
-// written to disk, so the recorded hashes match what Init actually wrote.
-func Compute(payloadFS fs.FS, coreVersion string) (Provenance, error) {
+// the given core version and target. Call this against the exact payload
+// that was just written to disk, so the recorded hashes match what Init
+// actually wrote.
+func Compute(payloadFS fs.FS, coreVersion, target string) (Provenance, error) {
 	files, err := HashAll(payloadFS)
 	if err != nil {
 		return Provenance{}, err
@@ -61,6 +63,7 @@ func Compute(payloadFS fs.FS, coreVersion string) (Provenance, error) {
 
 	return Provenance{
 		CoreVersion: coreVersion,
+		Target:      target,
 		InstalledAt: time.Now().UTC(),
 		Files:       files,
 	}, nil

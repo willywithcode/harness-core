@@ -7,11 +7,13 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"harness-core/internal/install"
 	"harness-core/internal/provenance"
 	"harness-core/internal/selfupdate"
+	"harness-core/internal/target"
 	"harness-core/internal/update"
 )
 
@@ -26,25 +28,17 @@ var coreVersion = "0.0.0-dev"
 // releases.
 const selfUpdateRepo = "willywithcode/harness-core"
 
-// Payload embeds the exact files this CLI ships into a consumer repository.
-// docs/, .agents/, and .claude/ already contain only the curated payload
-// subset; the "all:" prefix is required so embed does not silently skip
-// .agents and .claude (both begin with a dot, which embed excludes by
-// default).
-//
-// .claude/skills/ holds thin pointer files only: Claude Code's project
-// skill discovery scans exactly .claude/skills/<name>/SKILL.md and has no
-// knowledge of .agents/skills/, so a skill living only under .agents/ is
-// invisible to Claude Code even though its content is the canonical,
-// vendor-neutral Agent Skills definition every runtime should read. Each
-// pointer's frontmatter matches its real .agents/skills/<name>/SKILL.md
-// exactly, so Claude Code's auto-invocation matches on the same
-// description; its body just tells the agent to go read the real file.
+// Payload embeds the single canonical payload this CLI ships: AGENTS.md,
+// docs/, and .agents/skills/ (the vendor-neutral Agent Skills format). The
+// "all:" prefix is required so embed does not silently skip .agents (it
+// begins with a dot, which embed excludes by default). There is no
+// .claude/ here — internal/target.Build derives a Claude-Code-native
+// .claude/skills/ tree from this same payload at install time; see that
+// package for why it can't just be a static copy checked into git.
 //
 //go:embed AGENTS.md
 //go:embed docs
 //go:embed all:.agents
-//go:embed all:.claude
 var payload embed.FS
 
 func main() {
@@ -71,21 +65,31 @@ func main() {
 func runInit(args []string) {
 	dest := "."
 	override := false
+	targetName := target.Default
 	for _, a := range args {
-		if a == "--override" {
+		switch {
+		case a == "--override":
 			override = true
-			continue
+		case strings.HasPrefix(a, "--target="):
+			targetName = strings.TrimPrefix(a, "--target=")
+		default:
+			dest = a
 		}
-		dest = a
 	}
 
-	payloadFS, err := fs.Sub(payload, ".")
+	rawPayload, err := fs.Sub(payload, ".")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "harness-core: internal error reading embedded payload:", err)
 		os.Exit(1)
 	}
 
-	result, err := install.Init(payloadFS, dest, override)
+	targetFS, err := target.Build(rawPayload, targetName)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "harness-core init:", err)
+		os.Exit(1)
+	}
+
+	result, err := install.Init(targetFS, dest, override)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "harness-core init:", err)
 		os.Exit(1)
@@ -97,12 +101,12 @@ func runInit(args []string) {
 	for _, f := range result.Skipped {
 		fmt.Println("skipped (already exists):", f)
 	}
-	fmt.Printf("\n%d file(s) installed, %d skipped.\n", len(result.Written), len(result.Skipped))
+	fmt.Printf("\n%d file(s) installed, %d skipped (target: %s).\n", len(result.Written), len(result.Skipped), targetName)
 	if len(result.Skipped) > 0 && !override {
 		fmt.Println("Re-run with --override to replace existing files.")
 	}
 
-	prov, err := provenance.Compute(payloadFS, coreVersion)
+	prov, err := provenance.Compute(targetFS, coreVersion, targetName)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "harness-core init: computing provenance:", err)
 		os.Exit(1)
@@ -131,6 +135,7 @@ func runStatus(args []string) {
 	}
 
 	fmt.Println("core version:", prov.CoreVersion)
+	fmt.Println("target:", prov.Target)
 	fmt.Println("installed at:", prov.InstalledAt.Format(time.RFC3339))
 	fmt.Println()
 
@@ -165,12 +170,16 @@ func runStatus(args []string) {
 func runUpdate(args []string) {
 	dest := "."
 	apply := false
+	targetFlag := ""
 	for _, a := range args {
-		if a == "--apply" {
+		switch {
+		case a == "--apply":
 			apply = true
-			continue
+		case strings.HasPrefix(a, "--target="):
+			targetFlag = strings.TrimPrefix(a, "--target=")
+		default:
+			dest = a
 		}
-		dest = a
 	}
 
 	prov, err := provenance.Load(dest)
@@ -183,13 +192,31 @@ func runUpdate(args []string) {
 		os.Exit(1)
 	}
 
-	payloadFS, err := fs.Sub(payload, ".")
+	targetName := prov.Target
+	if targetName == "" {
+		targetName = "agent" // provenance predating the Target field
+	}
+	if targetFlag != "" {
+		targetName = targetFlag
+	}
+
+	rawPayload, err := fs.Sub(payload, ".")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "harness-core: internal error reading embedded payload:", err)
 		os.Exit(1)
 	}
 
-	plan, err := update.BuildPlan(payloadFS, dest, prov)
+	targetFS, err := target.Build(rawPayload, targetName)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "harness-core update:", err)
+		os.Exit(1)
+	}
+
+	if targetName != prov.Target {
+		fmt.Printf("switching target: %s -> %s\n\n", prov.Target, targetName)
+	}
+
+	plan, err := update.BuildPlan(targetFS, dest, prov)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "harness-core update: building plan:", err)
 		os.Exit(1)
@@ -204,7 +231,7 @@ func runUpdate(args []string) {
 	}
 
 	actionable := plan.Actionable()
-	upToDate := len(actionable) == 0 && prov.CoreVersion == coreVersion
+	upToDate := len(actionable) == 0 && prov.CoreVersion == coreVersion && targetName == prov.Target
 	if upToDate {
 		fmt.Println("\nAlready up to date.")
 		return
@@ -216,7 +243,7 @@ func runUpdate(args []string) {
 		return
 	}
 
-	backupDir, err := update.Apply(payloadFS, dest, plan)
+	backupDir, err := update.Apply(targetFS, dest, plan)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "harness-core update:", err)
 		os.Exit(1)
@@ -225,7 +252,7 @@ func runUpdate(args []string) {
 		fmt.Println("backed up previous content to:", backupDir)
 	}
 
-	newProv, err := provenance.Compute(payloadFS, coreVersion)
+	newProv, err := provenance.Compute(targetFS, coreVersion, targetName)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "harness-core update: computing provenance:", err)
 		os.Exit(1)
@@ -299,8 +326,13 @@ func runSelfUpdate(args []string) {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: harness-core init [dest] [--override]")
+	fmt.Fprintln(os.Stderr, "usage: harness-core init [dest] [--override] [--target=agent|claude|both]")
 	fmt.Fprintln(os.Stderr, "       harness-core status [dest]")
-	fmt.Fprintln(os.Stderr, "       harness-core update [dest] [--apply]")
+	fmt.Fprintln(os.Stderr, "       harness-core update [dest] [--apply] [--target=agent|claude|both]")
 	fmt.Fprintln(os.Stderr, "       harness-core self-update [--check]")
+	fmt.Fprintln(os.Stderr, "")
+	fmt.Fprintln(os.Stderr, "--target selects which skill discovery format(s) to install:")
+	fmt.Fprintln(os.Stderr, "  agent  - .agents/skills/ only (vendor-neutral, other agent runtimes)")
+	fmt.Fprintln(os.Stderr, "  claude - .claude/skills/ only (Claude Code's native discovery path)")
+	fmt.Fprintln(os.Stderr, "  both   - both, self-contained (default)")
 }
