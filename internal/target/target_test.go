@@ -25,12 +25,16 @@ func fakeRawPayload() fstest.MapFS {
 	}
 }
 
-func init() {
-	// This test's synthetic script path must match a real executable
-	// listed in the package's static table for the mode-propagation
-	// assertions below to be meaningful; since the real table only
-	// knows real payload paths, register this test's own path here.
-	executable[".agents/skills/demo-skill/scripts/run.py"] = true
+// withFakeExecutable registers path in the package's static executable
+// table for the duration of one test, then removes it via t.Cleanup. The
+// table is package-global production state (see executable_test.go, which
+// asserts it exactly matches git); a package-level init() that added a
+// synthetic test-only entry permanently would leak into every other test in
+// this package, including that assertion.
+func withFakeExecutable(t *testing.T, path string) {
+	t.Helper()
+	executable[path] = true
+	t.Cleanup(func() { delete(executable, path) })
 }
 
 func TestBuild_InvalidTarget(t *testing.T) {
@@ -40,6 +44,8 @@ func TestBuild_InvalidTarget(t *testing.T) {
 }
 
 func TestBuild_Agent(t *testing.T) {
+	withFakeExecutable(t, ".agents/skills/demo-skill/scripts/run.py")
+
 	out, err := Build(fakeRawPayload(), "agent")
 	if err != nil {
 		t.Fatalf("Build: %v", err)
@@ -61,6 +67,8 @@ func TestBuild_Agent(t *testing.T) {
 }
 
 func TestBuild_Claude(t *testing.T) {
+	withFakeExecutable(t, ".agents/skills/demo-skill/scripts/run.py")
+
 	out, err := Build(fakeRawPayload(), "claude")
 	if err != nil {
 		t.Fatalf("Build: %v", err)

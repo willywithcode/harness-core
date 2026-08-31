@@ -56,6 +56,8 @@ const claudeMD = "# Project Rules\n" +
 var executable = map[string]bool{
 	".agents/skills/onboard-repository/scripts/emit_evidence_bundle.py": true,
 	".agents/skills/onboard-repository/scripts/render_patch.py":         true,
+	".agents/skills/prompt-leverage/scripts/augment_prompt.py":          true,
+	".agents/skills/tldraw-api/scripts/tldraw_api.sh":                   true,
 }
 
 // Build returns an in-memory fs.FS holding exactly the files that should be
