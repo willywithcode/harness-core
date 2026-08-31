@@ -23,15 +23,11 @@ type Provenance struct {
 	Files       map[string]string `json:"files"` // relative path -> "sha256:<hex>"
 }
 
-// Compute hashes every file in payloadFS and returns a fresh Provenance for
-// the given core version. Call this against the exact payload that was just
-// written to disk, so the recorded hashes match what Init actually wrote.
-func Compute(payloadFS fs.FS, coreVersion string) (Provenance, error) {
-	p := Provenance{
-		CoreVersion: coreVersion,
-		InstalledAt: time.Now().UTC(),
-		Files:       map[string]string{},
-	}
+// HashAll hashes every file in payloadFS, keyed by its slash-separated
+// relative path. update.BuildPlan calls this to get the "UPSTREAM" side of
+// its three-way comparison without writing anything.
+func HashAll(payloadFS fs.FS) (map[string]string, error) {
+	hashes := map[string]string{}
 
 	err := fs.WalkDir(payloadFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -44,14 +40,30 @@ func Compute(payloadFS fs.FS, coreVersion string) (Provenance, error) {
 		if err != nil {
 			return err
 		}
-		p.Files[path] = hashHex(content)
+		hashes[path] = hashHex(content)
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return hashes, nil
+}
+
+// Compute hashes every file in payloadFS and returns a fresh Provenance for
+// the given core version. Call this against the exact payload that was just
+// written to disk, so the recorded hashes match what Init actually wrote.
+func Compute(payloadFS fs.FS, coreVersion string) (Provenance, error) {
+	files, err := HashAll(payloadFS)
 	if err != nil {
 		return Provenance{}, err
 	}
 
-	return p, nil
+	return Provenance{
+		CoreVersion: coreVersion,
+		InstalledAt: time.Now().UTC(),
+		Files:       files,
+	}, nil
 }
 
 // Save writes p to destDir/.harness-core/provenance.json.

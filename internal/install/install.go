@@ -1,7 +1,8 @@
 // Package install copies the embedded Harness payload into a consumer
-// repository. This is the stage-1 "copy-on-install" behavior: no provenance
-// tracking and no merge logic yet. An existing file is left untouched unless
-// override is set.
+// repository. This is the stage-1 "copy-on-install" behavior: no merge
+// logic here. An existing file is left untouched unless override is set.
+// WriteFile is also reused by the update package to apply individual
+// files once a three-way plan says it is safe to do so.
 package install
 
 import (
@@ -16,13 +17,36 @@ type Result struct {
 	Skipped []string
 }
 
-// executable lists payload paths that must be written with the execute bit
+// Executable lists payload paths that must be written with the execute bit
 // set. go:embed does not preserve source file permissions, so this cannot be
 // read from the embedded FS itself and must be kept in sync with the actual
 // git file mode (100755) of the payload manifest by hand.
-var executable = map[string]bool{
+var Executable = map[string]bool{
 	".agents/skills/onboard-repository/scripts/emit_evidence_bundle.py": true,
 	".agents/skills/onboard-repository/scripts/render_patch.py":         true,
+}
+
+// WriteFile copies one payload file to destDir/path, creating parent
+// directories as needed and preserving the execute bit for paths listed in
+// Executable.
+func WriteFile(payloadFS fs.FS, destDir, path string) error {
+	destPath := filepath.Join(destDir, filepath.FromSlash(path))
+
+	if err := os.MkdirAll(filepath.Dir(destPath), 0o755); err != nil {
+		return err
+	}
+
+	content, err := fs.ReadFile(payloadFS, path)
+	if err != nil {
+		return err
+	}
+
+	mode := os.FileMode(0o644)
+	if Executable[path] {
+		mode = 0o755
+	}
+
+	return os.WriteFile(destPath, content, mode)
 }
 
 // Init walks payloadFS and writes every file under destDir, preserving the
@@ -47,21 +71,7 @@ func Init(payloadFS fs.FS, destDir string, override bool) (Result, error) {
 			}
 		}
 
-		if err := os.MkdirAll(filepath.Dir(destPath), 0o755); err != nil {
-			return err
-		}
-
-		content, err := fs.ReadFile(payloadFS, path)
-		if err != nil {
-			return err
-		}
-
-		mode := os.FileMode(0o644)
-		if executable[path] {
-			mode = 0o755
-		}
-
-		if err := os.WriteFile(destPath, content, mode); err != nil {
+		if err := WriteFile(payloadFS, destDir, path); err != nil {
 			return err
 		}
 
