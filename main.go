@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -27,6 +28,20 @@ var coreVersion = "0.0.0-dev"
 // selfUpdateRepo is the GitHub "owner/repo" that hosts mustang
 // releases.
 const selfUpdateRepo = "willywithcode/harness-core"
+
+// newSelfUpdateClient returns a Client pointed at the real GitHub API,
+// unless MUSTANG_SELFUPDATE_API_BASE_URL is set, in which case it's pointed
+// there instead. That override is deliberately undocumented in --help: it
+// exists only so integration tests can point self-update at a local fake
+// server instead of the real GitHub release the running binary otherwise
+// always checks.
+func newSelfUpdateClient() *selfupdate.Client {
+	client := selfupdate.NewClient(selfUpdateRepo)
+	if base := os.Getenv("MUSTANG_SELFUPDATE_API_BASE_URL"); base != "" {
+		client.APIBaseURL = base
+	}
+	return client
+}
 
 // Payload embeds the single canonical payload this CLI ships: AGENTS.md,
 // docs/, and .agents/skills/ (the vendor-neutral Agent Skills format). The
@@ -187,12 +202,15 @@ func runUpdate(args []string) {
 
 	dest := "."
 	apply := false
+	noSelfUpdate := false
 	targetFlag := ""
 	var acceptUpstream, keepLocal []string
 	for _, a := range args {
 		switch {
 		case a == "--apply":
 			apply = true
+		case a == "--no-self-update":
+			noSelfUpdate = true
 		case strings.HasPrefix(a, "--target="):
 			targetFlag = strings.TrimPrefix(a, "--target=")
 		case strings.HasPrefix(a, "--accept-upstream="):
@@ -212,6 +230,21 @@ func runUpdate(args []string) {
 		}
 		fmt.Fprintln(os.Stderr, "mustang update:", err)
 		os.Exit(1)
+	}
+
+	// Skill/doc changes only reach a consumer through a newly released
+	// binary (go:embed bakes the payload in at compile time), so `update`
+	// alone can never see anything past whatever this binary shipped with.
+	// When --apply is set, self-update first if a newer release exists,
+	// then re-exec this same command against the freshly written binary so
+	// one `mustang update --apply` picks up new skills without a separate
+	// `self-update` step. --no-self-update opts out (e.g. offline, or a
+	// pinned binary in CI).
+	if apply && !noSelfUpdate {
+		if selfUpdateBinary() {
+			reExecUpdate(args)
+			return // unreachable: reExecUpdate always exits
+		}
 	}
 
 	targetName := prov.Target
@@ -289,6 +322,63 @@ func runUpdate(args []string) {
 	}
 
 	fmt.Printf("\nApplied %d change(s). Provenance updated to core version %s.\n", len(actionable), coreVersion)
+}
+
+// selfUpdateBinary checks the latest mustang release and, if newer, applies
+// it. It returns true only when a self-update was actually written to disk.
+// A failed version check (e.g. offline) is reported but never blocks the
+// payload update that follows -- checking for a newer binary is a courtesy,
+// not a requirement to proceed.
+func selfUpdateBinary() bool {
+	client := newSelfUpdateClient()
+
+	plan, err := client.Plan(coreVersion)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "mustang update: checking for a newer mustang release (continuing anyway):", err)
+		return false
+	}
+	if plan.UpToDate {
+		return false
+	}
+
+	fmt.Printf("newer mustang available: %s -> %s; self-updating first...\n", plan.CurrentVersion, plan.LatestVersion)
+	if err := client.Apply(plan); err != nil {
+		fmt.Fprintln(os.Stderr, "mustang update: self-updating (continuing with the current binary):", err)
+		return false
+	}
+
+	fmt.Println("binary updated; re-running to pick up the new payload...")
+	return true
+}
+
+// reExecUpdate re-runs `mustang update <args>` against the executable on
+// disk -- which selfUpdateBinary just replaced -- and exits this process
+// with that run's exit code. This is what makes the self-update above
+// transparent: the freshly written binary's embedded payload (new skills,
+// doc changes) is what the re-run's three-way comparison actually sees,
+// which this already-running process's old in-memory code cannot be made
+// to do by any other means.
+func reExecUpdate(args []string) {
+	exePath, err := os.Executable()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "mustang update: locating the updated executable to re-run:", err)
+		os.Exit(1)
+	}
+
+	cmd := exec.Command(exePath, append([]string{"update", "--no-self-update"}, args...)...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	runErr := cmd.Run()
+	if runErr == nil {
+		os.Exit(0)
+	}
+	if exitErr, ok := runErr.(*exec.ExitError); ok {
+		os.Exit(exitErr.ExitCode())
+	}
+	fmt.Fprintln(os.Stderr, "mustang update: re-running after self-update:", runErr)
+	os.Exit(1)
 }
 
 // resolveConflicts applies --accept-upstream and --keep-local resolutions
@@ -388,7 +478,7 @@ func runSelfUpdate(args []string) {
 		}
 	}
 
-	client := selfupdate.NewClient(selfUpdateRepo)
+	client := newSelfUpdateClient()
 
 	plan, err := client.Plan(coreVersion)
 	if err != nil {
@@ -450,6 +540,8 @@ Commands:
   init         Install the payload into dest (default: current directory).
   status       Compare files on disk against recorded provenance.
   update       Reconcile local changes with the current embedded payload.
+               (With --apply, self-updates the binary first if a newer
+               release exists, then re-runs itself automatically.)
   self-update  Replace this binary with the latest GitHub release.
 
 --target selects which skill discovery format(s) init/update use:
@@ -491,9 +583,18 @@ previews the plan; nothing is written.
   --keep-local=<path>        Resolve a conflict by keeping your local
                              edit; permanent, not a one-time skip
                              (repeatable).
+  --no-self-update           With --apply, skip the automatic binary
+                             self-update described below.
 
 If any conflict remains unresolved, --apply refuses to write anything at
 all, including non-conflicting files.
+
+New skills or doc changes only reach this binary through a new release
+(the payload is compiled in). With --apply, update checks for a newer
+mustang release first; if one exists, it self-updates and transparently
+re-runs itself so the same command picks up the new payload too --
+you never need a separate 'mustang self-update' step. --no-self-update
+skips this (useful offline, or with a binary pinned in CI).
 `
 
 const selfUpdateHelp = `mustang self-update [--check]

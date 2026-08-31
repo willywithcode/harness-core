@@ -78,7 +78,14 @@ modified: docs/patterns/encoding-invariants.md
 38 unchanged, 1 modified, 0 missing (of 39 tracked).
 ```
 
-### `mustang update [dest] [--apply] [--target=agent|claude|both] [--accept-upstream=<path>]... [--keep-local=<path>]...`
+### `mustang update [dest] [--apply] [--no-self-update] [--target=agent|claude|both] [--accept-upstream=<path>]... [--keep-local=<path>]...`
+
+New skills and doc changes only reach a consumer through a new release —
+the payload is compiled into the binary. With `--apply`, `update` checks
+for a newer mustang release first; if one exists, it self-updates the
+binary and transparently re-runs itself, so a new skill shows up from one
+`mustang update --apply` without a separate `self-update` step first. Pass
+`--no-self-update` to skip this (offline, or a binary pinned in CI).
 
 Compares three versions of every payload file:
 
@@ -195,7 +202,9 @@ Requires Go 1.22+.
 ```bash
 go build ./...        # build
 go vet ./...           # static checks
-go test ./...           # unit tests (target and selfupdate packages)
+go test ./...           # unit + integration tests (see -short to skip the
+                         # main_test.go integration tests, which build and
+                         # run real binaries and take a few seconds)
 go run . init /tmp/test # try it locally without installing
 ```
 
