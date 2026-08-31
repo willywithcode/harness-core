@@ -1,14 +1,13 @@
 # harness-core
 
-`harness-core` installs and maintains the [Harness](https://github.com/hoangnb24/repository-harness)
-agent-facing repository payload (`AGENTS.md`, `docs/`, `.agents/skills/`) in
-any repository, as a single self-updating binary with no runtime
-dependencies.
+`harness-core` installs and maintains a small set of agent-facing guidance
+files (`AGENTS.md`, `docs/`, `.agents/skills/`) in any repository, as a
+single self-updating binary with no runtime dependencies.
 
-It embeds the payload directly in the compiled binary, tracks exactly what it
-installed via a small provenance file, and safely reconciles upstream
-payload changes against a consumer's local edits — copying what's safe to
-copy, and refusing to guess at anything else.
+It never merges. A file you never touched gets updated safely; a file you
+edited is left alone — unless upstream changed it too, in which case it
+stops and asks you to decide. Reconciling conflicting intent is a human
+call, not something this tool will guess at.
 
 ## Install
 
