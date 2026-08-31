@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"harness-core/internal/install"
-	"harness-core/internal/provenance"
-	"harness-core/internal/selfupdate"
-	"harness-core/internal/target"
-	"harness-core/internal/update"
+	"mustang/internal/install"
+	"mustang/internal/provenance"
+	"mustang/internal/selfupdate"
+	"mustang/internal/target"
+	"mustang/internal/update"
 )
 
 // coreVersion identifies the payload (and binary) this build ships. The
@@ -24,7 +24,7 @@ import (
 // placeholder, which intentionally never matches a real release tag.
 var coreVersion = "0.0.0-dev"
 
-// selfUpdateRepo is the GitHub "owner/repo" that hosts harness-core
+// selfUpdateRepo is the GitHub "owner/repo" that hosts mustang
 // releases.
 const selfUpdateRepo = "willywithcode/harness-core"
 
@@ -79,19 +79,19 @@ func runInit(args []string) {
 
 	rawPayload, err := fs.Sub(payload, ".")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core: internal error reading embedded payload:", err)
+		fmt.Fprintln(os.Stderr, "mustang: internal error reading embedded payload:", err)
 		os.Exit(1)
 	}
 
 	targetFS, err := target.Build(rawPayload, targetName)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core init:", err)
+		fmt.Fprintln(os.Stderr, "mustang init:", err)
 		os.Exit(1)
 	}
 
 	result, err := install.Init(targetFS, dest, override)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core init:", err)
+		fmt.Fprintln(os.Stderr, "mustang init:", err)
 		os.Exit(1)
 	}
 
@@ -108,11 +108,11 @@ func runInit(args []string) {
 
 	prov, err := provenance.Compute(targetFS, coreVersion, targetName)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core init: computing provenance:", err)
+		fmt.Fprintln(os.Stderr, "mustang init: computing provenance:", err)
 		os.Exit(1)
 	}
 	if err := provenance.Save(dest, prov); err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core init: writing provenance:", err)
+		fmt.Fprintln(os.Stderr, "mustang init: writing provenance:", err)
 		os.Exit(1)
 	}
 	fmt.Println("provenance written:", filepath.Join(dest, provenance.RelPath))
@@ -130,7 +130,7 @@ func runStatus(args []string) {
 			fmt.Printf("not initialized: no %s found under %s\n", provenance.RelPath, dest)
 			os.Exit(1)
 		}
-		fmt.Fprintln(os.Stderr, "harness-core status:", err)
+		fmt.Fprintln(os.Stderr, "mustang status:", err)
 		os.Exit(1)
 	}
 
@@ -190,10 +190,10 @@ func runUpdate(args []string) {
 	prov, err := provenance.Load(dest)
 	if err != nil {
 		if os.IsNotExist(err) {
-			fmt.Printf("not initialized: no %s found under %s. Run `harness-core init` first.\n", provenance.RelPath, dest)
+			fmt.Printf("not initialized: no %s found under %s. Run `mustang init` first.\n", provenance.RelPath, dest)
 			os.Exit(1)
 		}
-		fmt.Fprintln(os.Stderr, "harness-core update:", err)
+		fmt.Fprintln(os.Stderr, "mustang update:", err)
 		os.Exit(1)
 	}
 
@@ -207,13 +207,13 @@ func runUpdate(args []string) {
 
 	rawPayload, err := fs.Sub(payload, ".")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core: internal error reading embedded payload:", err)
+		fmt.Fprintln(os.Stderr, "mustang: internal error reading embedded payload:", err)
 		os.Exit(1)
 	}
 
 	targetFS, err := target.Build(rawPayload, targetName)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core update:", err)
+		fmt.Fprintln(os.Stderr, "mustang update:", err)
 		os.Exit(1)
 	}
 
@@ -223,7 +223,7 @@ func runUpdate(args []string) {
 
 	plan, err := update.BuildPlan(targetFS, dest, prov)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core update: building plan:", err)
+		fmt.Fprintln(os.Stderr, "mustang update: building plan:", err)
 		os.Exit(1)
 	}
 
@@ -234,7 +234,7 @@ func runUpdate(args []string) {
 	if conflicts := plan.Conflicts(); len(conflicts) > 0 {
 		fmt.Printf("\n%d conflict(s) found. Resolve them with --accept-upstream=<path> (take the new "+
 			"version, backing up the old one first), --keep-local=<path> (keep your edit and stop asking), "+
-			"or by hand (edit the local file to match either side), then rerun `harness-core update`.\n",
+			"or by hand (edit the local file to match either side), then rerun `mustang update`.\n",
 			len(conflicts))
 		os.Exit(1)
 	}
@@ -254,7 +254,7 @@ func runUpdate(args []string) {
 
 	backupDir, err := update.Apply(targetFS, dest, plan)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core update:", err)
+		fmt.Fprintln(os.Stderr, "mustang update:", err)
 		os.Exit(1)
 	}
 	if backupDir != "" {
@@ -263,11 +263,11 @@ func runUpdate(args []string) {
 
 	newProv, err := provenance.Compute(targetFS, coreVersion, targetName)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core update: computing provenance:", err)
+		fmt.Fprintln(os.Stderr, "mustang update: computing provenance:", err)
 		os.Exit(1)
 	}
 	if err := provenance.Save(dest, newProv); err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core update: writing provenance:", err)
+		fmt.Fprintln(os.Stderr, "mustang update: writing provenance:", err)
 		os.Exit(1)
 	}
 
@@ -370,7 +370,7 @@ func runSelfUpdate(args []string) {
 
 	plan, err := client.Plan(coreVersion)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core self-update: checking latest release:", err)
+		fmt.Fprintln(os.Stderr, "mustang self-update: checking latest release:", err)
 		os.Exit(1)
 	}
 
@@ -385,7 +385,7 @@ func runSelfUpdate(args []string) {
 	}
 
 	if err := client.Apply(plan); err != nil {
-		fmt.Fprintln(os.Stderr, "harness-core self-update:", err)
+		fmt.Fprintln(os.Stderr, "mustang self-update:", err)
 		os.Exit(1)
 	}
 
@@ -393,11 +393,11 @@ func runSelfUpdate(args []string) {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: harness-core init [dest] [--override] [--target=agent|claude|both]")
-	fmt.Fprintln(os.Stderr, "       harness-core status [dest]")
-	fmt.Fprintln(os.Stderr, "       harness-core update [dest] [--apply] [--target=agent|claude|both]")
+	fmt.Fprintln(os.Stderr, "usage: mustang init [dest] [--override] [--target=agent|claude|both]")
+	fmt.Fprintln(os.Stderr, "       mustang status [dest]")
+	fmt.Fprintln(os.Stderr, "       mustang update [dest] [--apply] [--target=agent|claude|both]")
 	fmt.Fprintln(os.Stderr, "                           [--accept-upstream=<path>]... [--keep-local=<path>]...")
-	fmt.Fprintln(os.Stderr, "       harness-core self-update [--check]")
+	fmt.Fprintln(os.Stderr, "       mustang self-update [--check]")
 	fmt.Fprintln(os.Stderr, "")
 	fmt.Fprintln(os.Stderr, "--target selects which skill discovery format(s) to install:")
 	fmt.Fprintln(os.Stderr, "  agent  - .agents/skills/ only (vendor-neutral, other agent runtimes)")

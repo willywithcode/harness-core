@@ -1,4 +1,4 @@
-// Package selfupdate lets the harness-core binary replace itself with a
+// Package selfupdate lets the mustang binary replace itself with a
 // newer release published on GitHub. It never trusts GitHub's plain
 // "latest" convenience alone: it resolves the release, requires a matching
 // per-platform binary asset and a ".sha256" checksum sidecar published
@@ -79,7 +79,7 @@ type Plan struct {
 // AssetName returns the release asset name expected for the given
 // GOOS/GOARCH, matching exactly what the release workflow publishes.
 func AssetName(goos, goarch string) string {
-	name := fmt.Sprintf("harness-core-%s-%s", goos, goarch)
+	name := fmt.Sprintf("mustang-%s-%s", goos, goarch)
 	if goos == "windows" {
 		name += ".exe"
 	}
@@ -162,7 +162,7 @@ func (c *Client) Apply(plan Plan) error {
 func replaceExecutable(exePath string, content []byte) (err error) {
 	dir := filepath.Dir(exePath)
 
-	tmp, err := os.CreateTemp(dir, ".harness-core-selfupdate-*")
+	tmp, err := os.CreateTemp(dir, ".mustang-selfupdate-*")
 	if err != nil {
 		return err
 	}

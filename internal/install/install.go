@@ -54,7 +54,7 @@ func WriteFile(payloadFS fs.FS, destDir, path string) error {
 func writeAtomic(path string, content []byte, mode os.FileMode) (err error) {
 	dir := filepath.Dir(path)
 
-	tmp, err := os.CreateTemp(dir, ".harness-core-write-*")
+	tmp, err := os.CreateTemp(dir, ".mustang-write-*")
 	if err != nil {
 		return err
 	}

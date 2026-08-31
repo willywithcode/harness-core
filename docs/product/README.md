@@ -11,7 +11,7 @@ files after actual product domains, such as `overview.md`, `billing.md`,
 ## Current Product Contract
 
 No consumer-specific product contract is shipped in this generic directory.
-`harness-core`'s own contract lives in its root README, `docs/WORKFLOW.md`,
+`mustang`'s own contract lives in its root README, `docs/WORKFLOW.md`,
 lasting decisions, implementation, and executable tests.
 
 ## Update Rule

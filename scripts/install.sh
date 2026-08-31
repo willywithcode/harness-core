@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Downloads the latest harness-core release for this platform, verifies its
+# Downloads the latest mustang release for this platform, verifies its
 # SHA-256 checksum, and installs it. Delegates all product behavior (init,
 # status, update) to the installed binary -- this script only ever fetches
 # and verifies bytes.
@@ -7,7 +7,7 @@ set -euo pipefail
 
 REPO="willywithcode/harness-core"
 API="https://api.github.com/repos/${REPO}/releases/latest"
-INSTALL_DIR="${HARNESS_CORE_INSTALL_DIR:-$HOME/.local/bin}"
+INSTALL_DIR="${MUSTANG_INSTALL_DIR:-$HOME/.local/bin}"
 
 os="$(uname -s | tr '[:upper:]' '[:lower:]')"
 case "$os" in
@@ -22,7 +22,7 @@ case "$arch" in
   *) echo "error: unsupported architecture: $arch" >&2; exit 1 ;;
 esac
 
-asset="harness-core-${os}-${arch}"
+asset="mustang-${os}-${arch}"
 
 echo "Resolving latest release of ${REPO}..." >&2
 release_json="$(curl -fsSL "$API")"
@@ -63,10 +63,10 @@ fi
 
 chmod +x "${tmp}/${asset}"
 mkdir -p "$INSTALL_DIR"
-mv "${tmp}/${asset}" "${INSTALL_DIR}/harness-core"
+mv "${tmp}/${asset}" "${INSTALL_DIR}/mustang"
 
-echo "Installed harness-core to ${INSTALL_DIR}/harness-core" >&2
+echo "Installed mustang to ${INSTALL_DIR}/mustang" >&2
 case ":$PATH:" in
   *":$INSTALL_DIR:"*) ;;
-  *) echo "warning: ${INSTALL_DIR} is not on your PATH. Add it, then run: harness-core init" >&2 ;;
+  *) echo "warning: ${INSTALL_DIR} is not on your PATH. Add it, then run: mustang init" >&2 ;;
 esac

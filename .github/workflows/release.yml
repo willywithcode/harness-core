@@ -2,7 +2,7 @@ name: Release
 
 # Triggered by pushing a tag like v0.2.0. That tag is the single source of
 # truth for the released core version: the build step below stamps it into
-# the binary via -ldflags, so `harness-core self-update` always compares
+# the binary via -ldflags, so `mustang self-update` always compares
 # against the exact string GitHub published as the release tag.
 on:
   push:
@@ -45,13 +45,13 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           ext=""
           if [ "${{ matrix.goos }}" = "windows" ]; then ext=".exe"; fi
-          name="harness-core-${{ matrix.goos }}-${{ matrix.goarch }}${ext}"
+          name="mustang-${{ matrix.goos }}-${{ matrix.goarch }}${ext}"
           go build -trimpath -ldflags "-s -w -X main.coreVersion=${version}" -o "dist/${name}" .
           shasum -a 256 "dist/${name}" | awk '{print $1}' > "dist/${name}.sha256"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: harness-core-${{ matrix.goos }}-${{ matrix.goarch }}
+          name: mustang-${{ matrix.goos }}-${{ matrix.goarch }}
           path: dist/*
 
   release:

@@ -23,7 +23,7 @@ not overwrite those with upstream product assumptions.
 
 ## Source Repository
 
-This section describes `harness-core`'s own repository layout, not anything
+This section describes `mustang`'s own repository layout, not anything
 installed into a consumer repo:
 
 - Root `README.md`: install, usage, how it works, development, releases.

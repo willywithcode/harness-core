@@ -62,12 +62,15 @@ Read applicable instructions and the smallest repository map available. Record
 pre-existing dirt before doing anything else. If instructions conflict, follow
 the narrower instruction and report the conflict.
 
-When `.harness-core/manifest.json` exists and an installed managed file
-conflicts with `.harness-core/base/<path>`, treat the installed file as active
-instructions for the current run. For a correction proposal, verify the base
-file against its manifest checksum and show the conflict. Propose replacing
-only content inside managed markers and preserve all consumer-owned content
-outside them. Do not treat the managed base as permission to edit.
+When `.mustang/provenance.json` exists, its `files` map records the
+installed core version, target, and a SHA-256 hash per tracked path — not
+the original content. Run `mustang status` to see which tracked paths
+differ from that recorded hash (edited locally) versus match it (untouched
+since install); `.mustang/backup/<timestamp>/`, written just before an
+`update --apply` overwrite, is the only place a prior file's actual content
+may be recoverable, and only if such an update has run. Treat any locally
+modified tracked file as active instructions for the current run. Do not
+treat provenance tracking as permission to edit a managed file.
 
 A checksum-verified conflict in an active mandatory instruction that caused a
 failed, unavailable, or unsafe command is the first proposal priority. Preview

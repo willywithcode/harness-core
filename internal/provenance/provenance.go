@@ -14,7 +14,7 @@ import (
 )
 
 // RelPath is where provenance lives inside an installed repository.
-const RelPath = ".harness-core/provenance.json"
+const RelPath = ".mustang/provenance.json"
 
 // Provenance is the durable record written after a successful install.
 type Provenance struct {
@@ -69,7 +69,7 @@ func Compute(payloadFS fs.FS, coreVersion, target string) (Provenance, error) {
 	}, nil
 }
 
-// Save writes p to destDir/.harness-core/provenance.json.
+// Save writes p to destDir/.mustang/provenance.json.
 func Save(destDir string, p Provenance) error {
 	path := filepath.Join(destDir, filepath.FromSlash(RelPath))
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
@@ -83,7 +83,7 @@ func Save(destDir string, p Provenance) error {
 	return os.WriteFile(path, data, 0o644)
 }
 
-// Load reads provenance from destDir/.harness-core/provenance.json. It
+// Load reads provenance from destDir/.mustang/provenance.json. It
 // returns an *os.PathError satisfying os.IsNotExist when the repository has
 // no recorded provenance yet.
 func Load(destDir string) (Provenance, error) {

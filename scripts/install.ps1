@@ -1,4 +1,4 @@
-# Downloads the latest harness-core release for Windows, verifies its
+# Downloads the latest mustang release for Windows, verifies its
 # SHA-256 checksum, and installs it. Delegates all product behavior (init,
 # status, update) to the installed binary -- this script only ever fetches
 # and verifies bytes.
@@ -6,16 +6,16 @@ $ErrorActionPreference = "Stop"
 
 $Repo = "willywithcode/harness-core"
 $Api = "https://api.github.com/repos/$Repo/releases/latest"
-$InstallDir = if ($env:HARNESS_CORE_INSTALL_DIR) { $env:HARNESS_CORE_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA "harness-core" }
+$InstallDir = if ($env:MUSTANG_INSTALL_DIR) { $env:MUSTANG_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA "mustang" }
 
 $arch = if ([System.Environment]::Is64BitOperatingSystem) { "amd64" } else {
     Write-Error "unsupported architecture: 32-bit Windows is not published"
     exit 1
 }
-$asset = "harness-core-windows-$arch.exe"
+$asset = "mustang-windows-$arch.exe"
 
 Write-Host "Resolving latest release of $Repo..."
-$release = Invoke-RestMethod -Uri $Api -Headers @{ "User-Agent" = "harness-core-installer" }
+$release = Invoke-RestMethod -Uri $Api -Headers @{ "User-Agent" = "mustang-installer" }
 
 $binAsset = $release.assets | Where-Object { $_.name -eq $asset }
 if (-not $binAsset) {
@@ -48,13 +48,13 @@ try {
     }
 
     New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
-    $destPath = Join-Path $InstallDir "harness-core.exe"
+    $destPath = Join-Path $InstallDir "mustang.exe"
     Copy-Item -Path $binPath -Destination $destPath -Force
 
-    Write-Host "Installed harness-core to $destPath"
+    Write-Host "Installed mustang to $destPath"
     $pathEntries = $env:Path -split ";"
     if ($pathEntries -notcontains $InstallDir) {
-        Write-Warning "$InstallDir is not on your PATH. Add it, then run: harness-core init"
+        Write-Warning "$InstallDir is not on your PATH. Add it, then run: mustang init"
     }
 } finally {
     Remove-Item -Recurse -Force $tmp

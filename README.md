@@ -1,6 +1,8 @@
-# harness-core
+# mustang
 
-`harness-core` installs and maintains a small set of agent-facing guidance
+Hosted at [github.com/willywithcode/harness-core](https://github.com/willywithcode/harness-core) — the repository kept its original name, but the CLI, binary, and everything it installs are `mustang`.
+
+`mustang` installs and maintains a small set of agent-facing guidance
 files (`AGENTS.md`, `docs/`, and a set of skills) in any repository, as a
 single self-updating binary with no runtime dependencies.
 
@@ -21,8 +23,8 @@ irm https://raw.githubusercontent.com/willywithcode/harness-core/main/scripts/in
 
 Both scripts detect your platform, download the matching release binary and
 its `.sha256` checksum, verify the bytes, and install to
-`~/.local/bin/harness-core` (or `%LOCALAPPDATA%\harness-core\harness-core.exe`
-on Windows). Set `HARNESS_CORE_INSTALL_DIR` to install elsewhere. Make sure
+`~/.local/bin/mustang` (or `%LOCALAPPDATA%\mustang\mustang.exe`
+on Windows). Set `MUSTANG_INSTALL_DIR` to install elsewhere. Make sure
 the install directory is on your `PATH`.
 
 You can also download a binary directly from the
@@ -31,10 +33,10 @@ if you'd rather skip the script.
 
 ## Usage
 
-### `harness-core init [dest] [--override] [--target=agent|claude|both]`
+### `mustang init [dest] [--override] [--target=agent|claude|both]`
 
 Copies the payload into `dest` (default: current directory) and writes
-`dest/.harness-core/provenance.json`, recording the installed core version,
+`dest/.mustang/provenance.json`, recording the installed core version,
 target, and a SHA-256 hash per file. An existing file is left untouched
 unless `--override` is passed.
 
@@ -55,18 +57,18 @@ unless `--override` is passed.
 - `both` — both skill trees, each self-contained, plus the same `CLAUDE.md`.
 
 ```bash
-harness-core init .
-harness-core init ../some-other-repo --override
-harness-core init ../claude-only-repo --target=claude
+mustang init .
+mustang init ../some-other-repo --override
+mustang init ../claude-only-repo --target=claude
 ```
 
-### `harness-core status [dest]`
+### `mustang status [dest]`
 
 Compares the files on disk against the recorded provenance and reports which
 tracked files are unchanged, locally modified, or missing.
 
 ```bash
-$ harness-core status
+$ mustang status
 core version: 0.1.0
 target: both
 installed at: 2026-08-31T09:18:46Z
@@ -76,7 +78,7 @@ modified: docs/patterns/encoding-invariants.md
 38 unchanged, 1 modified, 0 missing (of 39 tracked).
 ```
 
-### `harness-core update [dest] [--apply] [--target=agent|claude|both] [--accept-upstream=<path>]... [--keep-local=<path>]...`
+### `mustang update [dest] [--apply] [--target=agent|claude|both] [--accept-upstream=<path>]... [--keep-local=<path>]...`
 
 Compares three versions of every payload file:
 
@@ -84,7 +86,7 @@ Compares three versions of every payload file:
 - **LOCAL** — what's actually on disk now;
 - **UPSTREAM** — the payload embedded in the binary you're currently running,
   built for the effective target: the target from provenance, or `--target`
-  if you pass one to switch (e.g. `harness-core update --target=both --apply`
+  if you pass one to switch (e.g. `mustang update --target=both --apply`
   adds `.claude/skills/` to an existing `agent`-only install; switching away
   from a target reports its files as "upstream removed" and leaves them on
   disk, untracked, rather than deleting them).
@@ -95,7 +97,7 @@ file upstream never changed is left alone even if you edited it. A file
 how to merge it. Run without `--apply` first to preview:
 
 ```bash
-$ harness-core update
+$ mustang update
 update: AGENTS.md
 CONFLICT: docs/WORKFLOW.md (modified locally and changed upstream)
 
@@ -104,7 +106,7 @@ CONFLICT: docs/WORKFLOW.md (modified locally and changed upstream)
 1 conflict(s) found. Resolve them with --accept-upstream=<path> (take the new
 version, backing up the old one first), --keep-local=<path> (keep your edit
 and stop asking), or by hand (edit the local file to match either side), then
-rerun `harness-core update`.
+rerun `mustang update`.
 ```
 
 If there is any unresolved conflict, `--apply` refuses to write **anything**
@@ -112,7 +114,7 @@ If there is any unresolved conflict, `--apply` refuses to write **anything**
 
 - `--accept-upstream=<path>` — take the new upstream content. The
   overwritten local content is backed up to
-  `dest/.harness-core/backup/<timestamp>/` first, same as any other
+  `dest/.mustang/backup/<timestamp>/` first, same as any other
   overwrite.
 - `--keep-local=<path>` — keep your edit exactly as-is; nothing is written.
   This is permanent, not a one-time skip: `update` won't ask about this
@@ -123,12 +125,12 @@ current conflict prints a warning and is otherwise ignored — it never
 silently no-ops your typo.
 
 ```bash
-harness-core update --apply
-harness-core update --accept-upstream=docs/WORKFLOW.md --apply
-harness-core update --keep-local=CLAUDE.md --apply
+mustang update --apply
+mustang update --accept-upstream=docs/WORKFLOW.md --apply
+mustang update --keep-local=CLAUDE.md --apply
 ```
 
-### `harness-core self-update [--check]`
+### `mustang self-update [--check]`
 
 Checks the latest GitHub release of this project, and — if newer — downloads
 the matching platform binary, verifies its SHA-256 checksum, and replaces
@@ -136,8 +138,8 @@ the running executable in place. `--check` only reports whether an update is
 available without downloading or writing anything.
 
 ```bash
-harness-core self-update --check
-harness-core self-update
+mustang self-update --check
+mustang self-update
 ```
 
 ## How it works
@@ -166,14 +168,13 @@ harness-core self-update
   for Claude Code users; it's skipped, like any other file, if one already
   exists.
 - **Provenance**: every `init` and `update --apply` writes
-  `.harness-core/provenance.json`: the installed core version, the target
+  `.mustang/provenance.json`: the installed core version, the target
   used, an install timestamp, and a SHA-256 hash per tracked file. This is
   the only state `update`'s three-way comparison needs.
 - **Copy-on-conflict, never merge**: `update` will never attempt to combine
   two versions of a file. A real conflict always stops and asks a human to
-  resolve it — matching the upstream Harness project's own position that
-  reconciling conflicting intent is a decision, not something a tool should
-  guess at.
+  resolve it — reconciling conflicting intent is a decision, not something
+  a tool should guess at.
 - **Atomic writes**: every file write goes through a temp file in the same
   directory, then an atomic rename. A process killed mid-write can never
   leave a payload file holding truncated or corrupted content.
@@ -223,8 +224,8 @@ git push origin v0.2.0
 `AGENTS.md`, `docs/`, and `.agents/skills/` at the repository root are both
 this project's own working payload *and* the exact content `init` embeds
 and ships. Edit them like any other tracked files, then cut a release —
-every installed `harness-core` binary out there will pick up the change via
-`harness-core update`. There is nothing to keep in sync by hand for Claude
+every installed `mustang` binary out there will pick up the change via
+`mustang update`. There is nothing to keep in sync by hand for Claude
 Code: `.claude/skills/` is always derived from `.agents/skills/` at install
 time (see `internal/target`), so adding, renaming, or editing a skill only
 ever means touching its one file under `.agents/skills/`.

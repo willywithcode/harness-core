@@ -1,3 +1,3 @@
-module harness-core
+module mustang
 
 go 1.22

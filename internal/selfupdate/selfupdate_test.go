@@ -107,11 +107,11 @@ func TestPlan_MissingAsset(t *testing.T) {
 }
 
 func TestApply_HappyPath(t *testing.T) {
-	newContent := []byte("this is the new harness-core binary")
+	newContent := []byte("this is the new mustang binary")
 	server, _ := newFakeGitHub(t, "v0.2.0", newContent, false)
 
 	dir := t.TempDir()
-	exePath := filepath.Join(dir, "harness-core")
+	exePath := filepath.Join(dir, "mustang")
 	if err := os.WriteFile(exePath, []byte("old binary content"), 0o755); err != nil {
 		t.Fatalf("seeding old executable: %v", err)
 	}
@@ -144,11 +144,11 @@ func TestApply_HappyPath(t *testing.T) {
 }
 
 func TestApply_ChecksumMismatchRejected(t *testing.T) {
-	newContent := []byte("this is the new harness-core binary")
+	newContent := []byte("this is the new mustang binary")
 	server, _ := newFakeGitHub(t, "v0.2.0", newContent, true) // bad checksum
 
 	dir := t.TempDir()
-	exePath := filepath.Join(dir, "harness-core")
+	exePath := filepath.Join(dir, "mustang")
 	original := []byte("old binary content")
 	if err := os.WriteFile(exePath, original, 0o755); err != nil {
 		t.Fatalf("seeding old executable: %v", err)

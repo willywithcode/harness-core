@@ -23,7 +23,7 @@ feedback, delivery, or environment boundary.
 
 ## Correct Owner
 
-Name `harness-core`, the consumer repository, the external environment,
+Name `mustang`, the consumer repository, the external environment,
 or the human decision that owns the correction.
 
 ## Intervention

@@ -20,8 +20,8 @@ import (
 	"sort"
 	"time"
 
-	"harness-core/internal/install"
-	"harness-core/internal/provenance"
+	"mustang/internal/install"
+	"mustang/internal/provenance"
 )
 
 // Category classifies one tracked or newly-discovered path.
@@ -186,7 +186,7 @@ func BuildPlan(payloadFS fs.FS, destDir string, prov provenance.Provenance) (Pla
 // Apply writes every Add and Update item to destDir. It refuses to write
 // anything if the plan still contains unresolved conflicts. Before
 // overwriting any Update-category file, it snapshots that file's current
-// content under destDir/.harness-core/backup/<timestamp>/ so the consumer
+// content under destDir/.mustang/backup/<timestamp>/ so the consumer
 // can recover it by hand if the new upstream content turns out to be
 // unwanted. It returns that backup directory, or "" if nothing needed
 // backing up (an Add-only or no-op apply).
@@ -227,7 +227,7 @@ func backup(destDir string, items []Item) (string, error) {
 	}
 
 	stamp := time.Now().UTC().Format("20060102T150405Z")
-	backupDir := filepath.Join(destDir, ".harness-core", "backup", stamp)
+	backupDir := filepath.Join(destDir, ".mustang", "backup", stamp)
 
 	for _, item := range toBackup {
 		src := filepath.Join(destDir, filepath.FromSlash(item.Path))
