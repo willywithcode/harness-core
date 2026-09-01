@@ -1,11 +1,11 @@
 ---
 name: smart-commits
-description: Organize an existing Git tree into logical commits and push them. Use when asked to commit everything, smart commit, group changes, clean the commit stack, or push work.
+description: Organize an existing Git tree into logical commits, and push only if explicitly asked to. Use when asked to commit everything, smart commit, group changes, clean the commit stack, or push work.
 ---
 
 # Smart Commits
 
-Turn the current working tree into one or more coherent commits, then push when the repository has a configured remote. This skill is for committing existing work. It must not become a feature-editing session.
+Turn the current working tree into one or more coherent commits. This skill is for committing existing work. It must not become a feature-editing session.
 
 ## Core Rules
 
@@ -14,7 +14,7 @@ Turn the current working tree into one or more coherent commits, then push when 
 - Preserve the user's requested boundary. If they say to leave a path, topic, or change set alone, do not stage it.
 - Stage exact files or hunks intentionally. Avoid `git add .` unless the whole tree has been inspected and belongs in one commit group.
 - Prefer conventional commit messages with a useful body explaining why the group belongs together.
-- Push after committing when a remote/upstream exists. If no push destination exists, leave the commits local and say so.
+- Push is visible to others and not always reversible: only push when the user's own request for this invocation asked for it (e.g. "push work", "push it", "commit and push"). "Commit everything," "smart commit," or "group changes" alone authorize committing, not pushing. When push wasn't requested, stop after committing, report the commits are ready, and ask before pushing.
 
 ## Workflow
 
@@ -39,11 +39,11 @@ Turn the current working tree into one or more coherent commits, then push when 
    git commit -m "<type>(<scope>): <subject>" -m "<body>"
    ```
 6. After each commit, re-run `git status --porcelain=v1` and continue until all in-scope changes are committed.
-7. Push:
+7. Push only if the user's request for this invocation explicitly asked for it (see Core Rules). If so:
    ```bash
    git push
    ```
-   If the branch lacks an upstream, use `git push -u origin <branch>` only when the remote and branch name are clearly correct.
+   If the branch lacks an upstream, use `git push -u origin <branch>` only when the remote and branch name are clearly correct. Otherwise, stop here: the commits are ready locally, and the user can ask you to push next.
 
 ## Grouping Guidance
 
@@ -61,4 +61,4 @@ Bad groups:
 
 ## Final Response
 
-Report the commits created, push result, validation run, and any remaining out-of-scope or uncommitted files. If the tree is already clean when invoked, verify the latest relevant commit and say no new commit was needed.
+Report the commits created, push result if push was requested (or that the commits are ready locally and awaiting a push decision if it wasn't), validation run, and any remaining out-of-scope or uncommitted files. If the tree is already clean when invoked, verify the latest relevant commit and say no new commit was needed.
