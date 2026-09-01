@@ -3,9 +3,14 @@
 If the repo already has a decision-record convention (for example a
 `docs/decisions/` directory, a `docs/templates/decision.md` template, or an
 equivalent documented elsewhere), use it as-is instead of the layout below:
-one decision system per repo, not two. Otherwise, ADRs live in `docs/adr/`
-and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.; create
-that directory lazily, only when the first ADR is needed.
+one decision system per repo, not two. Otherwise, ADRs live in root
+`docs/adr/` for a single-context repo; when `CONTEXT-MAP.md` establishes
+multiple contexts (see `SKILL.md`'s File structure section), root
+`docs/adr/` holds system-wide decisions and each context additionally gets
+its own `docs/adr/` next to that context's `CONTEXT.md`, wherever
+`CONTEXT-MAP.md` places it — not necessarily under `src/`. Either way,
+number sequentially within each such directory: `0001-slug.md`,
+`0002-slug.md`, etc., created lazily, only when the first ADR is needed.
 
 ## Template
 
@@ -36,7 +41,8 @@ increment by one.
 
 ## When to offer an ADR
 
-All three of these must be true:
+If the repo's own decision system documents when a decision must be
+recorded, that policy governs. Otherwise, all three of these must be true:
 
 1. **Hard to reverse**: the cost of changing your mind later is meaningful
 2. **Surprising without context**: a future reader will look at the code and wonder "why on earth did they do it this way?"

@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR.
+description: Build and sharpen a project's domain model. Use when the user wants to resolve or change codebase terminology (not merely discuss or look up an existing term), write or edit a CONTEXT.md, or record or edit an ADR.
 ---
 
 # Domain Modeling
@@ -71,7 +71,13 @@ When a term is resolved, update `CONTEXT.md` right there. Don't batch these up: 
 
 ### Offer ADRs sparingly
 
-Only offer to create an ADR when all three are true:
+If the repo's own decision system documents when a decision must be
+recorded (for example a "record a decision when..." list next to
+`docs/decisions/`), that policy governs; the three-part test below is this
+skill's fallback default, not an override of a stricter or narrower
+repo-defined trigger.
+
+Otherwise, only offer to create an ADR when all three are true:
 
 1. **Hard to reverse**: the cost of changing your mind later is meaningful
 2. **Surprising without context**: a future reader will wonder "why did they do it this way?"
