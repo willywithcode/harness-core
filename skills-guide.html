@@ -1,0 +1,1541 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Cẩm nang tiếng Việt về Harness, mustang và 28 skill trong repository harness-core.">
+<title>Harness Core | Cẩm nang 28 skill</title>
+<style>
+:root {
+  --ink:#242925; --muted:#65706a; --line:#e0e6e1; --wash:#f3f6f3;
+  --green:#24664e; --mint:#e7f1e9; --coral:#b9533d; --accent:#d6ef92;
+  --mono:Consolas,'Liberation Mono',monospace; --sidebar:238px;
+}
+* {box-sizing:border-box;letter-spacing:0}
+html {scroll-behavior:smooth;scroll-padding-top:28px}
+body {margin:0;background:#fcfdfb;color:var(--ink);font:16px/1.7 'Segoe UI',Arial,sans-serif}
+a {color:var(--green);text-underline-offset:4px}
+button,input,select {font:inherit}
+button {cursor:pointer}
+button:disabled {cursor:default;opacity:.45}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible {outline:3px solid #7aaf51;outline-offset:4px}
+p {margin:0 0 16px}
+h1,h2,h3 {line-height:1.2;margin:0;font-weight:650}
+h1 {font:400 62px/1.12 Georgia,'Times New Roman',serif}
+h1 em {color:var(--green);font-weight:400}
+h2 {font-size:29px}
+h3 {font-size:18px}
+code {font-family:var(--mono);font-size:.87em;overflow-wrap:anywhere}
+p code,li code {background:var(--wash);padding:2px 4px;border-radius:3px}
+.icon {width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.skip {position:fixed;top:-80px;left:20px;z-index:10;background:white;padding:10px}
+.skip:focus {top:10px}
+.sidebar {position:fixed;inset:0 auto 0 0;width:var(--sidebar);padding:34px 22px 24px;background:#222824;color:#f4f7ef;display:flex;flex-direction:column;z-index:3}
+.brand {display:flex;align-items:center;gap:11px;text-decoration:none;color:#f4f7ef;font-size:21px;font-weight:650}
+.brand-mark {display:grid;place-items:center;width:36px;height:36px;background:var(--accent);color:#263320;font:italic 700 30px Georgia,serif;border-radius:6px}
+.sidebar-caption {color:#a8b4aa;font-size:12px;margin:16px 0 47px}
+.nav-label,.eyebrow {font:500 10px/1.4 var(--mono);text-transform:uppercase}
+.nav-label {color:#93a093;margin:0 12px 15px}
+.nav {display:grid;gap:7px}
+.nav a {display:flex;gap:11px;align-items:center;text-decoration:none;color:#bbc5be;padding:13px 11px;border:1px solid transparent;border-radius:5px;font-size:13px;transition:background .18s,color .18s}
+.nav a:hover {color:white;background:#303a32}
+.nav a[aria-current] {background:#354332;border-color:#536445;color:#e0f2b4}
+.nav a span:last-child {margin-left:auto;color:#99a48d;font:10px var(--mono)}
+.nav a[aria-current] span:last-child {color:#e0f2b4}
+.sidebar-bottom {margin-top:auto;border-top:1px solid #445046;padding-top:23px;font-size:11px;color:#9eaea2;line-height:1.9}
+.sidebar-bottom a {display:flex;align-items:center;gap:8px;margin-top:12px;color:#dde5de;text-decoration:none}
+.sidebar-bottom a:hover {color:var(--accent)}
+.sidebar-bottom .icon {width:15px;height:15px}
+.main {margin-left:var(--sidebar);padding:26px 52px 0;max-width:1400px}
+.topbar {display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line);color:var(--muted);font:10px var(--mono)}
+.topbar strong {font-weight:500;color:var(--ink)}
+.topbar-actions {display:flex;align-items:center;gap:15px}
+.edition {font-size:10px;display:flex;align-items:center;gap:7px}
+.edition:before {content:'';width:5px;height:5px;border-radius:50%;background:var(--green)}
+.icon-button {width:38px;height:38px;border:1px solid var(--line);background:transparent;color:var(--muted);display:inline-grid;place-items:center;border-radius:6px;flex:none;transition:background .15s,color .15s}
+.icon-button:hover {color:var(--green);background:var(--mint)}
+.intro {padding:28px 0 0}
+.eyebrow {color:var(--green);margin-bottom:17px;display:flex;gap:9px;align-items:center}
+.eyebrow:before {content:'';display:block;width:19px;height:1px;background:currentColor}
+.intro p {max-width:755px;color:var(--muted);font-size:17px;line-height:1.75;margin:20px 0}
+.intro strong {font-weight:600;color:var(--ink)}
+.intro-actions {display:flex;align-items:center;gap:25px;margin:19px 0 22px;font-size:13px}
+.intro-actions a {display:inline-flex;gap:9px;align-items:center;text-decoration:none}
+.intro-actions a:first-child {font-weight:650}
+.intro-actions a:last-child {color:var(--muted)}
+.intro-actions .icon {width:15px;height:15px;transition:transform .18s}
+.intro-actions a:hover .icon {transform:translateX(3px)}
+.intro-meta {display:grid;grid-template-columns:1fr 1fr 1.4fr;border-top:1px solid var(--line);margin-top:12px}
+.intro-meta>span {display:flex;align-items:center;gap:12px;padding:14px 14px 14px 0;color:var(--muted);font-size:12px}
+.intro-meta>span+span {border-left:1px solid var(--line);padding-left:23px}
+.intro-meta b {font:400 29px Georgia,serif;color:var(--ink)}
+.diagram {margin:0;padding:18px 24px 5px;background:#252e29;color:white}
+.diagram figcaption {display:flex;justify-content:space-between;align-items:center;gap:15px;font-size:11px}
+.diagram figcaption b {font-weight:500;color:#d7e8bd}
+.diagram figcaption span {font:9px var(--mono);color:#a5b5aa}
+#workflow-canvas {display:block;width:100%;height:118px}
+.section {padding:42px 0;border-bottom:1px solid var(--line)}
+.section-head {margin-bottom:22px}
+.section-number {display:flex;align-items:center;gap:10px;font:10px var(--mono);color:var(--coral);margin-bottom:13px}
+.section-number:before {content:'';width:20px;height:2px;background:var(--coral)}
+.section-intro {max-width:765px;font-size:15px;color:var(--muted);line-height:1.75;margin:13px 0 0}
+.tools {display:grid;grid-template-columns:minmax(180px,1fr) 195px 160px 42px;gap:12px;align-items:end;padding:0 0 17px;border-bottom:1px solid var(--line)}
+.field-label {display:block;font-size:10px;font-weight:600;color:var(--muted);margin-bottom:8px}
+.search-box {display:block;position:relative}
+.search-box>.icon {position:absolute;left:13px;top:14px;color:var(--muted);width:18px;height:18px}
+input[type=search],select {width:100%;height:46px;background:#fff;border:1px solid #d7dfd7;border-radius:6px;color:var(--ink);font-size:12px}
+input[type=search] {padding:0 12px 0 40px}
+input[type=search]:focus {background:#f8fcf6}
+select {padding:0 25px 0 12px}
+.tools>.icon-button {height:46px;width:42px;background:white}
+.results-line {display:flex;justify-content:space-between;gap:16px;align-items:center;margin:12px 0;font:11px var(--mono);min-height:26px}
+#result-count {color:var(--muted)}
+.text-button {background:none;border:0;padding:5px 0;color:var(--green);text-decoration:underline;text-underline-offset:4px;font-size:12px}
+#skill-list {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;align-items:start}
+.skill {min-width:0;border:1px solid var(--line);background:white;border-radius:8px;scroll-margin-top:24px;transition:border-color .18s,box-shadow .18s}
+.skill:hover {border-color:#bbc9bc;box-shadow:0 3px 12px #24362908}
+.skill summary {list-style:none;display:grid;grid-template-columns:36px minmax(0,1fr) 17px;gap:13px;align-items:start;padding:22px 20px;min-height:151px;cursor:pointer}
+.skill summary::-webkit-details-marker {display:none}
+.skill-symbol {display:grid;place-items:center;width:36px;height:36px;border-radius:7px;background:var(--group-tint);color:var(--group-color);margin-top:3px}
+.skill-symbol .icon {width:18px;height:18px}
+.skill-index {font:10px var(--mono);color:#7a847b}
+.skill-kind {display:block;color:var(--group-color);font-size:10px;line-height:1.5;margin-bottom:8px}
+.skill-name {display:block;font:600 13px/1.65 var(--mono);overflow-wrap:anywhere;color:var(--ink)}
+.skill-subtitle {display:block;color:var(--muted);font-size:13px;line-height:1.6;margin-top:5px}
+.summary-end {display:flex;flex-direction:column;align-items:center;gap:22px}
+.chevron {display:block;color:#8a968c;transition:transform .2s}
+.chevron .icon {width:16px;height:16px}
+.skill[open] {grid-column:1 / -1;border-color:#a8bfa9;box-shadow:0 5px 20px #253a2708}
+.skill[open] summary {min-height:auto;padding:24px 27px 23px;grid-template-columns:42px minmax(0,1fr) 20px;gap:17px;background:#f5f8f3;border-radius:7px 7px 0 0}
+.skill[open] .skill-symbol {width:42px;height:42px}
+.skill[open] .skill-name {font-size:16px}
+.skill[open] .skill-subtitle {font-size:14px}
+.skill[open] .summary-end {flex-direction:row;gap:8px;justify-content:end}
+.skill[open] .skill-index {display:none}
+.skill[open] .chevron {transform:rotate(180deg);color:var(--green)}
+.skill-detail {padding:25px 32px 29px}
+.skill-lead {font-size:15px;line-height:1.8;max-width:870px;margin:0 0 12px}
+.mode {display:inline-flex;align-items:center;gap:6px;color:var(--green);background:var(--mint);border-radius:3px;padding:3px 8px;font-size:10px;margin-bottom:24px}
+.mode:before {content:'';width:4px;height:4px;background:var(--green);border-radius:50%}
+.deep-dive {margin:2px 0 30px}
+.deep-heading {display:flex;align-items:end;justify-content:space-between;gap:18px;padding:0 0 15px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.deep-heading h4 {margin:0;font:650 25px/1.3 'Segoe UI',Arial,sans-serif;color:var(--ink)}
+.chapter-count {font:10px var(--mono);color:var(--muted);white-space:nowrap}
+.deep-opening {display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.8fr);gap:30px;margin-bottom:27px}
+.deep-opening h5,.deep-panel h5,.quick-heading {margin:0 0 10px;font-size:10px;line-height:1.5;text-transform:uppercase;color:var(--group-color);font-weight:650}
+.deep-opening p,.deep-panel p {font-size:14px;line-height:1.85;margin:0}
+.analogy {align-self:start;border-left:2px solid var(--group-color);padding:3px 0 3px 17px;color:var(--muted);font-style:italic}
+.deep-layout {display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:17px;margin-bottom:17px}
+.deep-panel {border:1px solid var(--line);padding:21px 22px;background:#fff}
+.deep-panel.example {background:var(--group-tint);border-color:transparent}
+.deep-flow {counter-reset:deepstep;display:grid;gap:0;margin:2px 0 0;padding:0;list-style:none}
+.deep-flow li {counter-increment:deepstep;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:10px 0;font-size:13px;line-height:1.7;border-top:1px solid var(--line)}
+.deep-flow li:first-child {border-top:0;padding-top:2px}
+.deep-flow li:before {content:counter(deepstep);display:grid;place-items:center;width:22px;height:22px;margin-top:2px;background:var(--group-tint);color:var(--group-color);font:600 10px var(--mono);border-radius:4px}
+.deep-compare {display:grid;grid-template-columns:1fr 1fr;gap:17px;margin:17px 0 0}
+.deep-compare .deep-panel {padding-top:18px}
+.remember {background:#252d29;color:#f3f6ef;border:0}
+.remember h5 {color:#cfe99b}
+.remember p {font:600 17px/1.65 'Segoe UI',Arial,sans-serif}
+.quick-heading {display:flex;align-items:center;gap:10px;margin:30px 0 17px;color:var(--muted)}
+.quick-heading:after {content:'';height:1px;flex:1;background:var(--line)}
+.detail-grid {display:grid;grid-template-columns:1fr 1fr;gap:25px 35px}
+.detail-grid>div {border-top:1px solid var(--line);padding-top:16px}
+.detail-grid h4,.prompt-label {margin:0 0 10px;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.detail-grid p,.detail-grid ol {font-size:14px;line-height:1.8;margin:0}
+.detail-grid ol {padding-left:19px}
+.detail-grid li+li {margin-top:7px}
+.detail-grid li::marker {color:var(--green);font-weight:600}
+.detail-note {font-size:13px;border-left:2px solid #cb8261;padding:2px 0 2px 15px;margin:26px 0}
+.detail-note strong {color:var(--coral);font-weight:600}
+.prompt {position:relative;background:#252d29;color:#f3f6ef;border-radius:0;padding:21px 66px 21px 23px;margin:25px -32px 0}
+.prompt-label {color:#bfdaa0;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.prompt-label:before {content:'>';font:14px var(--mono);color:#d6ef92}
+.prompt pre {white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.9 var(--mono);margin:0}
+.prompt .icon-button {position:absolute;top:17px;right:20px;width:34px;height:34px;background:#354137;border-color:#4a574d;color:#d8e8d5}
+.prompt .icon-button:hover {background:#4c6048}
+.detail-links {display:flex;flex-wrap:wrap;gap:12px 23px;margin-top:22px;font-size:12px}
+.detail-links a {display:inline-flex;gap:6px;align-items:center;overflow-wrap:anywhere}
+.detail-links a:first-child {margin-right:auto;font-weight:600}
+.detail-links svg {width:14px;height:14px}
+.chapter-nav {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:25px 0 0;padding-top:21px;border-top:1px solid var(--line)}
+.chapter-nav a {display:flex;align-items:center;gap:11px;min-width:0;padding:13px 14px;border:1px solid var(--line);border-radius:6px;text-decoration:none;background:white;color:var(--muted);font-size:10px;text-transform:uppercase}
+.chapter-nav a:last-child {justify-content:flex-end;text-align:right}
+.chapter-nav a:only-child {grid-column:2}
+.chapter-nav a:hover {border-color:var(--green);color:var(--green)}
+.chapter-nav strong {display:block;color:var(--ink);font:600 11px/1.5 var(--mono);text-transform:none;overflow-wrap:anywhere}
+.chapter-nav .icon {width:15px;height:15px}
+.empty {padding:45px 0;text-align:center;color:var(--muted)}
+.empty h3 {margin-bottom:8px}
+[hidden] {display:none!important}
+#philosophy {counter-reset:principle}
+.quote {border:0;border-top:1px solid #bed0bd;border-bottom:1px solid #bed0bd;padding:27px 0;margin:30px 0 15px;max-width:850px;font:400 34px/1.4 Georgia,'Times New Roman',serif;color:var(--green)}
+.source {font-size:11px;color:var(--muted)}
+a.source {color:var(--green)}
+.principles {display:grid;grid-template-columns:1fr 1fr;gap:33px 38px;margin:33px 0 42px}
+.principle {border-top:1px solid var(--line);padding-top:21px;position:relative}
+.principle:before {counter-increment:principle;content:'0' counter(principle);display:block;font:italic 24px Georgia,serif;color:var(--coral);margin-bottom:13px}
+.principle h3 {font-size:18px;margin-bottom:13px}
+.principle p {font-size:14px;line-height:1.85;color:var(--muted);margin-bottom:12px}
+.concept-table {width:100%;border-collapse:collapse;font-size:13px;margin-top:20px}
+.concept-table th,.concept-table td {text-align:left;vertical-align:top;padding:17px 14px;border-bottom:1px solid var(--line)}
+.concept-table th {background:#eef3eb;font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase}
+.concept-table td:first-child {font-weight:600;min-width:100px}
+.how-grid {display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:28px}
+.how-grid h3 {margin-bottom:14px}
+.how-grid p,.how-grid li {font-size:14px;color:var(--muted);line-height:1.85}
+.how-grid ol {padding-left:20px}
+.how-grid li {padding-bottom:10px}
+.terminal {background:#252d29;color:#f0f5ea;padding:23px;border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.95 var(--mono);margin:19px 0}
+.terminal .comment {color:#aec38f}
+.callout {padding:21px 0 0;border-top:1px solid var(--line);font-size:12px;line-height:1.9;color:var(--muted);margin-top:25px}
+.callout strong {color:var(--ink)}
+.recipes {margin-top:28px}
+.recipe {display:grid;grid-template-columns:50px minmax(0,1fr);gap:15px;padding:27px 0;border-top:1px solid var(--line)}
+.recipe-num {font:italic 28px Georgia,serif;color:var(--coral)}
+.recipe h3 {font-size:18px}
+.recipe p {font-size:14px;color:var(--muted);margin:10px 0 15px;max-width:780px}
+.chain {display:flex;align-items:center;flex-wrap:wrap;gap:11px;font:12px/1.8 var(--mono)}
+.chain a {overflow-wrap:anywhere}
+.chain svg {width:14px;height:14px;color:#8c9b8a}
+.footer {padding:27px 0 35px;display:flex;justify-content:space-between;gap:28px;font-size:11px;line-height:1.85;color:var(--muted)}
+.footer p {margin:0}
+.footer>a {white-space:nowrap}
+.toast {position:fixed;bottom:24px;left:calc(50% + 100px);transform:translateX(-50%);padding:12px 18px;background:#263d2d;color:white;border:1px solid #5e7659;border-radius:6px;font-size:13px;box-shadow:0 6px 28px #0002;max-width:calc(100% - 30px);z-index:9}
+.noscript {margin:20px;padding:20px;border:1px solid var(--coral)}
+@media(min-width:1700px) {.main {padding-left:75px;padding-right:75px}}
+@media(max-width:1190px) {
+  :root {--sidebar:215px}
+  .sidebar {padding:28px 17px 22px}
+  .brand {font-size:19px}
+  .main {padding:23px 32px 0}
+  .tools {grid-template-columns:minmax(0,1fr) 178px 42px}
+  .mode-filter {grid-column:1 / -1;grid-row:2}
+  .mode-filter select {max-width:235px}
+  .skill summary {padding:19px 16px;gap:10px;min-height:163px;grid-template-columns:30px minmax(0,1fr) 15px}
+  .skill-symbol {width:30px;height:30px}
+  .skill-name {font-size:12px}
+  .intro-meta>span {font-size:11px;gap:9px}
+  .intro-meta>span+span {padding-left:15px}
+}
+@media(max-width:900px) and (min-width:761px) {
+  #skill-list {grid-template-columns:1fr}
+  .skill summary {min-height:120px}
+  h1 {font-size:55px}
+  .intro-meta {grid-template-columns:1fr 1fr}
+  .intro-meta>span:last-child {grid-column:1 / -1;padding:0 0 18px;border:0}
+  .intro-meta>span:last-child b {font-size:22px}
+  .detail-grid,.how-grid {grid-template-columns:1fr}
+  .deep-opening,.deep-layout {grid-template-columns:1fr}
+}
+@media(max-width:760px) {
+  html {scroll-padding-top:20px}
+  .sidebar {position:relative;width:100%;padding:18px 20px 0}
+  .brand {font-size:20px}
+  .brand-mark {width:32px;height:32px;font-size:27px}
+  .sidebar-caption {margin:8px 0 18px;font-size:11px}
+  .nav-label,.sidebar-bottom {display:none}
+  .nav {display:flex;overflow-x:auto;gap:6px;padding-bottom:13px;scrollbar-width:none}
+  .nav::-webkit-scrollbar {display:none}
+  .nav a {white-space:nowrap;padding:8px 10px;font-size:11px}
+  .nav a svg,.nav a span:last-child {display:none}
+  .main {margin:0;padding:20px 22px 0}
+  .topbar {position:absolute;top:17px;right:20px;padding:0;border:0;z-index:4}
+  .topbar>span {display:none}
+  .topbar .icon-button {border-color:#566052;color:#d9e5d3}
+  .topbar .icon-button:hover {background:#354332}
+  .edition {display:none}
+  .intro {padding:26px 0 0}
+  h1 {font-size:46px}
+  .intro p {font-size:15px;line-height:1.8;margin:16px 0}
+  .eyebrow {font-size:9px;margin-bottom:13px}
+  .intro-actions {margin:19px 0 23px;gap:20px;font-size:12px}
+  .intro-meta {grid-template-columns:1fr 1fr}
+  .intro-meta>span {font-size:10px;gap:10px;padding:15px 8px 15px 0}
+  .intro-meta b {font-size:24px}
+  .intro-meta>span+span {padding-left:14px}
+  .intro-meta>span:last-child {grid-column:1 / -1;border-left:0;border-top:1px solid var(--line);padding:12px 0}
+  .intro-meta>span:last-child b {font-size:19px}
+  .diagram {margin:0 -22px;padding:17px 22px 0}
+  .diagram figcaption {font-size:10px}
+  .diagram figcaption span {display:none}
+  #workflow-canvas {height:204px}
+  .section {padding:34px 0}
+  .section-head {margin-bottom:22px}
+  .section-number {font-size:9px;margin-bottom:12px}
+  h2 {font-size:25px}
+  .section-intro {font-size:14px}
+  .tools {grid-template-columns:minmax(0,1fr) 42px;gap:12px}
+  .search-field {grid-column:1 / -1}
+  .category-filter {grid-column:1;grid-row:2}
+  .mode-filter {grid-column:1;grid-row:3}
+  .mode-filter select {max-width:none}
+  .tools>.icon-button {grid-column:2;grid-row:2}
+  #skill-list {grid-template-columns:1fr;gap:12px}
+  .skill summary {min-height:130px;padding:20px 17px;grid-template-columns:32px minmax(0,1fr) 14px;gap:11px}
+  .skill-symbol {width:32px;height:32px}
+  .skill-kind {font-size:9px}
+  .skill-name {font-size:12px}
+  .skill-subtitle {font-size:13px}
+  .skill[open] summary {padding:20px 17px;grid-template-columns:32px minmax(0,1fr) 14px;gap:11px}
+  .skill[open] .skill-symbol {width:32px;height:32px}
+  .skill[open] .skill-name {font-size:13px}
+  .skill[open] .skill-subtitle {font-size:13px}
+  .skill-detail {padding:20px 19px 23px}
+  .skill-lead {font-size:14px}
+  .detail-grid {grid-template-columns:1fr;gap:21px}
+  .deep-heading h4 {font-size:24px}
+  .deep-opening,.deep-layout,.deep-compare {grid-template-columns:1fr;gap:15px}
+  .deep-opening {margin-bottom:15px}
+  .deep-panel {padding:18px 17px}
+  .remember p {font-size:17px}
+  .chapter-nav {grid-template-columns:1fr}
+  .chapter-nav a:last-child {justify-content:flex-start;text-align:left}
+  .chapter-nav a:only-child {grid-column:1}
+  .detail-grid p,.detail-grid ol {font-size:13px}
+  .detail-note {font-size:12px;margin:23px 0}
+  .prompt {margin:23px -19px 0;padding:20px 53px 20px 19px}
+  .prompt pre {font-size:11px}
+  .prompt .icon-button {top:15px;right:13px;width:30px;height:30px}
+  .detail-links {gap:13px;font-size:11px}
+  .detail-links a:first-child {width:100%;margin:0}
+  .principles,.how-grid {grid-template-columns:1fr;gap:27px}
+  .quote {font-size:27px;padding:22px 0}
+  .principle h3 {font-size:18px}
+  .concept-table {font-size:12px}
+  .concept-table td,.concept-table th {padding:12px 7px}
+  .concept-table td:first-child {min-width:66px}
+  .concept-table td:last-child {overflow-wrap:anywhere}
+  .recipe {grid-template-columns:27px minmax(0,1fr);gap:12px}
+  .recipe-num {font-size:24px}
+  .recipe h3 {font-size:17px}
+  .chain {font-size:11px;gap:9px}
+  .footer {flex-direction:column;gap:14px}
+  .toast {left:50%}
+}
+@media(max-width:360px) {
+  .main {padding-left:17px;padding-right:17px}
+  .diagram {margin-left:-17px;margin-right:-17px;padding-left:17px;padding-right:17px}
+  h1 {font-size:40px}
+  .intro-actions {gap:14px;font-size:11px}
+  .skill summary,.skill[open] summary {grid-template-columns:minmax(0,1fr) 15px}
+  .skill-symbol {display:none}
+}
+@media(prefers-reduced-motion:reduce) {html {scroll-behavior:auto}*,*:before,*:after {transition:none!important}}
+@media print {
+  body {background:white;font-size:11pt}
+  .sidebar,.topbar,.tools,.results-line,.icon-button,.toast,.skip,.empty,.intro-actions {display:none!important}
+  .main {margin:0;padding:0;max-width:none}
+  .section {padding:20px 0}
+  .intro {padding-top:0}
+  h1 {font-size:34pt}
+  h2 {font-size:21pt}
+  .intro-meta {grid-template-columns:1fr 1fr 1.4fr}
+  .intro-meta>span:last-child {grid-column:auto;border-top:0;border-left:1px solid var(--line);padding:15px}
+  .diagram {margin:0;background:#252e29;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  #workflow-canvas {height:128px}
+  #skill-list {display:block}
+  .skill {break-inside:avoid;margin-bottom:15px;box-shadow:none!important}
+  .skill[hidden] {display:block!important}
+  .skill[open] summary {background:#f5f8f3}
+  .skill-detail {padding:20px}
+  .skill-symbol {display:none}
+  .skill[open] summary {grid-template-columns:minmax(0,1fr) 18px}
+  .detail-grid {grid-template-columns:1fr 1fr;gap:20px}
+  .deep-opening,.deep-layout,.deep-compare {grid-template-columns:1fr 1fr}
+  .prompt {margin:20px 0 0;background:#f0f3ed;color:#242925;border:1px solid #d7dfd7;padding:15px}
+  .prompt-label {color:#24664e}
+  .principles,.how-grid {grid-template-columns:1fr 1fr}
+  .footer {font-size:9pt}
+}
+</style>
+</head>
+<body>
+<!-- Lucide icon geometry, ISC license: https://lucide.dev/license. -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><defs>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/></symbol>
+<symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></symbol>
+<symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-5-6-5m8 12h8"/></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M6 15V6a3 3 0 0 1 3-3h2m2 18h2a3 3 0 0 0 3-3V9"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M15 3h6v6m-11 5L21 3m-3 10v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+<symbol id="i-expand" viewBox="0 0 24 24"><path d="m7 10 5-5 5 5m-10 4 5 5 5-5"/></symbol>
+<symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+</defs></svg>
+<a class="skip" href="#main">Đến nội dung chính</a>
+<aside class="sidebar" aria-label="Mục lục">
+<a class="brand" href="#overview"><span class="brand-mark" aria-hidden="true">h</span>harness-core</a>
+<p class="sidebar-caption">Cẩm nang dự án &amp; kỹ năng</p>
+<p class="nav-label">Trong cẩm nang</p>
+<nav class="nav">
+<a href="#overview" aria-current="location"><svg class="icon"><use href="#i-book"/></svg>Tổng quan<span>00</span></a>
+<a href="#catalog"><svg class="icon"><use href="#i-grid"/></svg>Thư viện skill<span>28</span></a>
+<a href="#philosophy"><svg class="icon"><use href="#i-compass"/></svg>Triết lý dự án<span>02</span></a>
+<a href="#usage"><svg class="icon"><use href="#i-terminal"/></svg>Bắt đầu sử dụng<span>03</span></a>
+<a href="#recipes"><svg class="icon"><use href="#i-route"/></svg>Tình huống thực tế<span>04</span></a>
+</nav>
+<div class="sidebar-bottom">Nguồn: repository hiện tại<br>Bản biên soạn · 06.09.2026<a href="README.md"><svg class="icon"><use href="#i-link"/></svg>README của mustang</a><a href="docs/WORKFLOW.md"><svg class="icon"><use href="#i-link"/></svg>Quy trình gốc</a></div>
+</aside>
+<main class="main" id="main">
+<div class="topbar"><span>THE FIELD GUIDE / <strong>TIẾNG VIỆT</strong></span><div class="topbar-actions"><span class="edition">REPOSITORY EDITION · 2026</span><button class="icon-button" id="print" type="button" title="In toàn bộ cẩm nang / lưu PDF" aria-label="In toàn bộ cẩm nang / lưu PDF"><svg class="icon"><use href="#i-print"/></svg></button></div></div>
+<section id="overview" class="intro">
+<div class="eyebrow">Repository-first · Evidence-driven</div>
+<h1>Harness <em>Core.</em></h1>
+<p>Một bộ hướng dẫn giúp coding agent hiểu đúng dự án, chọn đúng cách làm và chứng minh kết quả. CLI <strong>mustang</strong> đóng gói, cài đặt và cập nhật bộ hướng dẫn ấy vào repository của bạn.</p>
+<div class="intro-actions"><a href="#skill-onboard-repository">Bắt đầu với skill 01 <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a><a href="#philosophy">Triết lý của dự án <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+<div class="intro-meta"><span><b>28</b> chương giải thích</span><span><b>01</b> nguồn nội dung chuẩn</span><span><b>03</b> target: agent · claude · both</span></div>
+</section>
+<figure class="diagram">
+<figcaption><b>Một công việc đi qua Harness</b><span>Tóm lược từ WORKFLOW.md</span></figcaption>
+<canvas id="workflow-canvas" role="img" aria-label="Đọc căn cứ trong repository, chọn cách làm, thực hiện trong phạm vi đã chốt, kiểm chứng kết quả và giữ tri thức bền vững trong repository.">Đọc căn cứ → Chọn cách làm → Thực hiện → Kiểm chứng kết quả.</canvas>
+</figure>
+<section id="catalog" class="section">
+<div class="section-head"><span class="section-number">01 / THƯ VIỆN</span><h2>Chọn skill cho việc cần làm</h2><p class="section-intro">Mỗi skill là một chương có giải thích từ gốc, luồng hoạt động và ví dụ thực tế. Mở một mục để đọc sâu, hoặc dùng điều hướng trước/sau để học lần lượt cả 28 skill.</p></div>
+<div class="tools">
+<label class="search-field"><span class="field-label">Tìm skill hoặc nhu cầu</span><span class="search-box"><svg class="icon"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Tên skill, debug, kiến trúc, tài liệu..." autocomplete="off" aria-controls="skill-list"></span></label>
+<label class="category-filter"><span class="field-label">Nhóm công việc</span><select id="category" aria-controls="skill-list"><option value="all">Tất cả nhóm</option></select></label>
+<label class="mode-filter"><span class="field-label">Cách kích hoạt</span><select id="mode" aria-controls="skill-list"><option value="all">Tất cả</option><option value="explicit">Gọi đích danh</option><option value="context">Theo ngữ cảnh</option></select></label>
+<button class="icon-button" id="expand" title="Mở tất cả kết quả" aria-label="Mở tất cả kết quả" type="button"><svg class="icon"><use href="#i-expand"/></svg></button>
+</div>
+<div class="results-line"><span id="result-count" role="status" aria-live="polite"></span><button class="text-button" id="reset" type="button" hidden>Xóa bộ lọc</button></div>
+<div id="skill-list"></div>
+<div id="empty" class="empty" hidden><h3>Chưa có skill phù hợp</h3><p>Không có kết quả khớp với từ khóa và bộ lọc hiện tại.</p><button class="text-button" type="button" id="empty-reset">Xem lại toàn bộ 28 skill</button></div>
+<noscript><p class="noscript">Phần tra cứu skill cần JavaScript. Bạn có thể đọc tài liệu gốc trong <a href=".agents/skills/">.agents/skills/</a>; phần triết lý và hướng dẫn bên dưới vẫn đọc được.</p></noscript>
+<p class="callout"><strong>Về nhãn kích hoạt:</strong> “Gọi đích danh” gồm các skill có <code>disable-model-invocation: true</code> và các skill yêu cầu gọi rõ trong nội dung. “Theo ngữ cảnh” nghĩa là tài liệu cho phép agent nhận diện nhu cầu; khả năng nạp thực tế còn phụ thuộc môi trường đang dùng. Danh sách phản ánh file trong repository, không phải danh sách đã được nạp ở mọi phiên.</p>
+</section>
+<section id="philosophy" class="section">
+<span class="section-number">02 / TƯ TƯỞNG</span><h2>Để agent làm việc có căn cứ</h2>
+<p class="section-intro">Bắt đầu từ kết quả người dùng cần, tìm đúng nguồn quyết định trong repository, rồi dùng bằng chứng phù hợp để xác nhận công việc đã xong.</p>
+<blockquote class="quote">Tri thức ở đúng chỗ. Quyết định có người sở hữu. Kết quả có bằng chứng.</blockquote>
+<p class="source">Câu trên là cách diễn giải của cẩm nang. Các nguyên tắc dưới đây được tổng hợp từ tài liệu gốc.</p>
+<div class="principles">
+<article class="principle"><h3>Repository là nguồn sự thật</h3><p>Ý định sản phẩm, quyết định, kế hoạch, code, test và tín hiệu khi chạy cùng tạo nên bức tranh dự án. Agent đọc đúng phần liên quan và phân biệt “được quy định” với “đang được triển khai”.</p><p>Ví dụ: một giá trị mặc định trong code cho biết hành vi hiện tại; nó chưa đủ để khẳng định đó là chính sách sản phẩm đã được chấp thuận.</p><a class="source" href="docs/WORKFLOW.md">Nguồn: Repository Workflow</a></article>
+<article class="principle"><h3>Quy trình vừa với công việc</h3><p>Câu hỏi và review là công việc chỉ đọc. Thay đổi nhỏ đi qua đọc, sửa và kiểm tra. Việc kéo dài nhiều phiên hoặc cần phối hợp, phụ thuộc hay phục hồi có một kế hoạch trong <code>docs/plans/active/</code>.</p><p>Harness dùng file của repository để giữ ngữ cảnh; không có task database hay vòng đời điều phối riêng.</p><a class="source" href="docs/WORKFLOW.md">Nguồn: Select The Work Shape</a></article>
+<article class="principle"><h3>Con người quyết định ý định</h3><p>Khi một chính sách mới còn nhiều cách hiểu khác nhau, cần người có thẩm quyền chốt lựa chọn. Agent tìm dữ kiện, trình bày hệ quả và thực hiện trong phạm vi đã được xác lập.</p><p>CLI thể hiện điều này khi cập nhật: nếu LOCAL và UPSTREAM thay đổi khác nhau so với BASE, nó báo conflict để người dùng chọn nội dung cần giữ.</p><a class="source" href="README.md">Nguồn: Update &amp; Copy-on-conflict</a></article>
+<article class="principle"><h3>Bằng chứng khớp lời khẳng định</h3><p>“Đã sửa bug” cần cách tái hiện cho thấy lỗi được bắt trước khi sửa và hết sau khi sửa. “Đã chặn vi phạm” cần chứng minh trường hợp đúng được phép và trường hợp sai bị chặn vì đúng lý do.</p><p>Check chạy trên máy cá nhân, CI có gọi check và branch protection có chặn merge là các mức bằng chứng khác nhau.</p><a class="source" href="docs/patterns/encoding-invariants.md">Nguồn: Encoding Invariants</a></article>
+<article class="principle"><h3>Giữ ngữ cảnh gọn và có đường dẫn</h3><p><code>AGENTS.md</code> là bản đồ. Skill và tài liệu chuyên sâu được đọc khi cần. Một chỉ dẫn tốt nói rõ tài liệu là gì và trong tình huống nào cần đọc nó.</p><p>Đây là sự cân bằng giữa lượng thông tin agent phải mang theo và lượng kiến thức người dùng phải nhớ để gọi đúng công cụ.</p><a class="source" href=".agents/skills/writing-for-agents/SKILL.md">Nguồn: Writing for Agents</a></article>
+<article class="principle"><h3>Cải thiện bằng thử nghiệm có thể so sánh</h3><p>Khi agent gặp vướng mắc lặp lại, lưu tình huống và tìm nơi thiếu ngữ cảnh, khả năng, quyền quyết định hoặc bằng chứng. Với yêu cầu <code>$improve-harness</code>, một thay đổi nhỏ được thử bằng phiên agent mới làm việc tương đương.</p><p>Chỉ giữ cải tiến khi lần chạy mới thực sự sử dụng nó và tạo ra kết quả đủ tốt để bù chi phí duy trì.</p><a class="source" href=".agents/skills/improve-harness/SKILL.md">Nguồn: Improve Harness</a></article>
+</div>
+<h3 style="margin-bottom:14px">Ba khái niệm dễ nhầm</h3>
+<table class="concept-table"><thead><tr><th>Khái niệm</th><th>Vai trò trong dự án</th><th>Nơi đọc</th></tr></thead><tbody>
+<tr><td>Harness</td><td>Bộ hướng dẫn, giới hạn và cách kiểm chứng giúp agent làm việc trong repository.</td><td><a href="AGENTS.md">AGENTS.md</a><br><a href="docs/WORKFLOW.md">WORKFLOW.md</a></td></tr>
+<tr><td>mustang</td><td>CLI Go phân phối và cập nhật bộ hướng dẫn. Nội dung được nhúng trong binary khi build.</td><td><a href="README.md">README.md</a><br><a href="main.go">main.go</a></td></tr>
+<tr><td>Skill</td><td>Một thư mục có SKILL.md; có thể đi kèm script, tài liệu tham chiếu và metadata cho agent.</td><td><a href=".agents/skills/">.agents/skills/</a></td></tr>
+</tbody></table>
+</section>
+<section id="usage" class="section">
+<span class="section-number">03 / BẮT ĐẦU</span><h2>Từ cài đặt đến một yêu cầu rõ ràng</h2>
+<p class="section-intro">Các lệnh dưới đây lấy từ README của repository và giả định bạn đã có binary <code>mustang</code> trong PATH. Xem <a href="README.md">README</a> để cài binary phù hợp.</p>
+<div class="how-grid">
+<div><h3>1. Đưa bộ hướng dẫn vào dự án</h3><pre class="terminal"><span class="comment"># Chạy trong repository cần cài</span>
+mustang init . --target=both
+
+<span class="comment"># Xem thay đổi cục bộ</span>
+mustang status
+
+<span class="comment"># Xem trước kế hoạch cập nhật</span>
+mustang update
+
+<span class="comment"># Áp dụng khi đã xem xét</span>
+mustang update --apply</pre>
+<p><code>agent</code> tạo cây <code>.agents/skills/</code>; <code>claude</code> tạo cây <code>.claude/skills/</code> và <code>CLAUDE.md</code>; <code>both</code> là mặc định. Cây Claude được sinh từ một nguồn chuẩn.</p>
+<p><code>init</code> bỏ qua file đã tồn tại trừ khi có <code>--override</code>. Với target Claude, nếu <code>CLAUDE.md</code> đã có sẵn thì cần kiểm tra việc thêm <code>@AGENTS.md</code> theo README.</p></div>
+<div><h3>2. Gọi skill cùng nhiệm vụ cụ thể</h3><ol>
+<li><strong>Nêu kết quả:</strong> bạn muốn câu trả lời, báo cáo, prototype hay thay đổi code?</li>
+<li><strong>Gắn nguồn:</strong> chỉ rõ module, spec, commit gốc, log hoặc đường dẫn liên quan.</li>
+<li><strong>Chốt phạm vi:</strong> phần được sửa, điều cần giữ và quyết định đã thống nhất.</li>
+<li><strong>Nêu cách kiểm chứng:</strong> hành vi nào phải đúng và cần báo cáo bằng chứng gì?</li>
+</ol><pre class="terminal">Dùng skill diagnosing-bugs để chẩn đoán
+lỗi tính phí hai lần khi nhấn thanh toán.
+
+Nguồn: module checkout và log đã che dữ liệu.
+Kết quả: cách tái hiện, nguyên nhân, đề xuất sửa.
+Phạm vi hiện tại: chỉ chẩn đoán.</pre>
+<p>Các prompt mẫu dùng câu “Dùng skill …” để thể hiện ý định. Cú pháp cụ thể tùy môi trường; một số skill minh họa bằng <code>/tên-skill</code> hoặc <code>$tên-skill</code>. Nếu skill chưa được nạp, cung cấp đường dẫn tới <code>SKILL.md</code> tương ứng.</p></div>
+</div>
+<div class="callout"><strong>Hiểu trước khi cập nhật:</strong> <code>mustang update</code> so sánh BASE / LOCAL / UPSTREAM. File chưa sửa cục bộ được cập nhật khi upstream đổi; file chỉ sửa cục bộ được giữ. Nếu hai phía khác nhau cùng đổi, hãy chọn theo đường dẫn bằng <code>--accept-upstream=&lt;path&gt;</code> hoặc <code>--keep-local=&lt;path&gt;</code>. Còn conflict thì phần áp dụng payload từ chối ghi; <code>update --apply</code> vẫn có thể tự cập nhật binary trước bước này. File bị ghi đè được backup; file upstream bỏ đi được giữ trên đĩa. <a href="README.md">Chi tiết và các ngoại lệ trong README</a>.</div>
+</section>
+<section id="recipes" class="section">
+<span class="section-number">04 / ÁP DỤNG</span><h2>Bắt đầu từ tình huống của bạn</h2>
+<p class="section-intro">Các chuỗi dưới đây là gợi ý biên tập để chọn bước tiếp theo. Mỗi bước là một yêu cầu riêng, với đầu vào và phạm vi phù hợp.</p>
+<div class="recipes" id="recipe-list"></div>
+<div class="callout"><strong>Chọn giữa các skill gần nhau:</strong> <code>diagnosing-bugs</code> tìm nguyên nhân của lỗi đã quan sát; <code>tdd</code> triển khai hành vi bằng test trước. <code>codebase-design</code> giúp thiết kế một module; <code>improve-codebase-architecture</code> tìm khu vực đáng cải tổ. <code>onboard-repository</code> khảo sát và đề xuất; <code>audit-onboarding-proposal</code> kiểm tra độc lập đề xuất ấy. <code>grill-me</code> gọi <code>grilling</code>; <code>grill-with-docs</code> bổ sung <code>domain-modeling</code>.</div>
+</section>
+<footer class="footer"><p>Cẩm nang biên soạn từ 28 file <code>SKILL.md</code> trong repository.<br>Nội dung giới thiệu và prompt mẫu là bản diễn giải; tài liệu gốc là nơi đối chiếu khi có khác biệt.</p><a href="#overview">Về đầu trang ↑</a></footer>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script id="skill-data" type="application/json">
+[
+  {
+    "id": "onboard-repository",
+    "group": "understand",
+    "explicit": true,
+    "title": "Lập bản đồ một repository chưa quen",
+    "about": "Khảo sát repository, lần theo một luồng vận hành thật và đề xuất bổ sung hướng dẫn dựa trên bằng chứng để agent về sau làm việc độc lập hơn.",
+    "when": "Mới nhận dự án cũ, cần hiểu cách chạy, nguồn quyết định và khoảng trống trong tài liệu dành cho agent.",
+    "input": "Repository, luồng cần ưu tiên và phạm vi onboarding. Lần áp dụng sau cần các mục đề xuất đã được duyệt chính xác.",
+    "steps": [
+      "Ghi nhận ranh giới và trạng thái ban đầu; đọc nguồn có thẩm quyền.",
+      "Lần theo một luồng, phân loại điều đã biết, điều suy ra và điều chưa xác định.",
+      "Xuất bản đồ và bản vá đề xuất có bằng chứng; áp dụng ở lượt sau theo phạm vi được duyệt."
+    ],
+    "output": "Bản đồ vận hành có dẫn nguồn, khoảng trống và đề xuất cụ thể; quy trình hiện tại xuất bộ bằng chứng v2 bằng script.",
+    "note": "Lượt đầu chỉ đọc: không sửa file, cài công cụ, chạy dịch vụ hay tạo file tạm. Người dùng cần gọi rõ nhu cầu onboarding.",
+    "prompt": "Dùng skill onboard-repository để khảo sát repository này, ưu tiên luồng từ CLI đến ghi file. Lượt đầu chỉ đọc; trả về bản đồ có dẫn nguồn, điểm chưa xác minh và đề xuất tài liệu có bằng chứng.",
+    "related": [
+      "audit-onboarding-proposal"
+    ]
+  },
+  {
+    "id": "audit-onboarding-proposal",
+    "group": "understand",
+    "title": "Kiểm tra độc lập một đề xuất onboarding",
+    "about": "Đối chiếu từng lời khẳng định và phần bản vá onboarding với bằng chứng thô và repository ở revision đã chốt.",
+    "when": "Cần kiểm tra độc lập trước khi áp dụng hướng dẫn do một agent khác đề xuất.",
+    "input": "Transcript thô và SHA-256 kỳ vọng, worktree và revision, phiên bản skill, đề xuất chính xác; chế độ kiểm tra hunk cần các hunk ID cụ thể.",
+    "steps": [
+      "Mở phiên mới không tham gia tạo đề xuất; xác minh digest transcript.",
+      "Kiểm tra capsule, nguồn dẫn và từng mệnh đề của bản vá.",
+      "Báo kết luận theo đúng chế độ audit; tách hạn chế môi trường khỏi lỗi lập luận."
+    ],
+    "output": "Báo cáo audit có căn cứ, hoặc PATCH_APPLY / PATCH_NO_APPLY theo từng hunk trong chế độ patch-admissibility.",
+    "note": "Chỉ đọc, không tạo trạng thái. Kết luận bản vá đủ bằng chứng không tự cấp quyền áp dụng. Digest sai dẫn tới INVALID.",
+    "prompt": "Dùng skill audit-onboarding-proposal trong phiên độc lập. Transcript: \u003cđường-dẫn>, SHA-256: \u003cdigest>, repository: \u003cworktree>, revision: \u003csha>. Chỉ đánh giá các hunk \u003cIDs> trong capsule v2 ở chế độ patch-admissibility.",
+    "related": [
+      "onboard-repository"
+    ]
+  },
+  {
+    "id": "research",
+    "group": "understand",
+    "title": "Nghiên cứu và lưu kết quả có nguồn",
+    "about": "Điều tra câu hỏi bằng tài liệu chính thức, source code, đặc tả hoặc API từ chủ sở hữu.",
+    "when": "Cần câu trả lời có căn cứ về một công nghệ hoặc phương án và muốn giữ kết quả làm tài liệu lâu dài.",
+    "input": "Câu hỏi, phạm vi, tiêu chí so sánh và vị trí lưu nếu cần tài liệu.",
+    "steps": [
+      "Giao phần điều tra cho agent nền khi môi trường hỗ trợ.",
+      "Lần từng khẳng định về nguồn sơ cấp và ghi điều chưa biết.",
+      "Lưu một file Markdown có trích dẫn khi người dùng yêu cầu lưu bền vững."
+    ],
+    "output": "Kết quả có nguồn; một tài liệu Markdown nếu được yêu cầu lưu.",
+    "note": "Việc dùng agent nền không tự cho phép ghi file. Nếu chỉ cần câu trả lời, kết quả nằm trong cuộc trò chuyện.",
+    "prompt": "Dùng skill research để so sánh hai phương án cache cho workload trong \u003cspec>. Ưu tiên nguồn sơ cấp, nêu giả định và lưu kết quả có trích dẫn vào \u003cđường-dẫn.md>.",
+    "related": [
+      "grilling"
+    ]
+  },
+  {
+    "id": "grilling",
+    "group": "understand",
+    "title": "Làm rõ quyết định bằng câu hỏi theo nhánh",
+    "about": "Biến ý tưởng hoặc kế hoạch thành cây quyết định. Mỗi vòng hỏi những câu đã đủ tiền đề, kèm phương án được đề xuất.",
+    "when": "Ý tưởng còn nhiều giả định hoặc bạn muốn kiểm tra tính nhất quán của thiết kế trước khi triển khai.",
+    "input": "Ý tưởng, mục tiêu, ràng buộc và quyết định đã chốt.",
+    "steps": [
+      "Xác định các quyết định đã đủ tiền đề và hỏi trong cùng một vòng.",
+      "Agent tự tra dữ kiện; người dùng trả lời lựa chọn cần phán đoán.",
+      "Lặp đến khi hết nhánh chưa rõ, xác nhận hiểu chung và ghi kế hoạch nếu công việc cần nhớ bền vững."
+    ],
+    "output": "Thiết kế được làm rõ các lựa chọn; bản kế hoạch khi đáp ứng tiêu chí của repository.",
+    "note": "Kết thúc phỏng vấn chưa đồng nghĩa đã triển khai. Câu phụ thuộc quyết định chưa chốt phải đợi vòng sau.",
+    "prompt": "Dùng skill grilling để kiểm tra kế hoạch thêm retry cho tác vụ nhập dữ liệu. Làm rõ điều kiện retry, tính lặp an toàn, giới hạn và bằng chứng cần có trước khi triển khai.",
+    "related": [
+      "grill-me",
+      "grill-with-docs"
+    ]
+  },
+  {
+    "id": "grill-me",
+    "group": "understand",
+    "explicit": true,
+    "title": "Lối gọi nhanh để kiểm tra một ý tưởng",
+    "about": "Skill điều hướng gọi grilling để phỏng vấn và làm sắc nét kế hoạch hoặc thiết kế.",
+    "when": "Muốn chủ động yêu cầu agent chất vấn các giả định trong ý tưởng của mình.",
+    "input": "Kế hoạch hoặc ý tưởng cần làm rõ và ràng buộc đã biết.",
+    "steps": [
+      "Gọi đích danh grill-me với ý tưởng.",
+      "Thực hiện các vòng hỏi đáp của grilling.",
+      "Chốt hiểu biết chung và bước tiếp theo."
+    ],
+    "output": "Kết quả của grilling: cây quyết định đã được giải quyết, cùng kế hoạch nếu cần lưu bền vững.",
+    "note": "Đây là lối gọi tới grilling, không có quy trình phỏng vấn riêng.",
+    "prompt": "Dùng skill grill-me để chất vấn ý tưởng tách phần xử lý thanh toán thành một module riêng. Mục tiêu là giảm lỗi khi thay đổi nhà cung cấp.",
+    "related": [
+      "grilling"
+    ]
+  },
+  {
+    "id": "grill-with-docs",
+    "group": "understand",
+    "explicit": true,
+    "title": "Làm rõ thiết kế và lưu ngôn ngữ miền",
+    "about": "Kết hợp grilling với domain-modeling để việc chốt thiết kế đồng thời làm rõ thuật ngữ và quyết định kiến trúc cần lưu.",
+    "when": "Thảo luận tạo ra thuật ngữ mới hoặc quyết định quan trọng mà người khác sẽ cần hiểu về sau.",
+    "input": "Chủ đề thiết kế, CONTEXT.md và ADR liên quan nếu có.",
+    "steps": [
+      "Nạp grilling và domain-modeling.",
+      "Làm rõ cây quyết định và thống nhất từ vựng.",
+      "Ghi glossary và các quyết định đủ điều kiện theo quy ước repository."
+    ],
+    "output": "Thiết kế rõ ràng hơn, cùng cập nhật mô hình miền hoặc ADR phù hợp.",
+    "note": "Skill có thể tạo hoặc sửa tài liệu. Việc ghi ADR tuân theo tiêu chí của domain-modeling.",
+    "prompt": "Dùng skill grill-with-docs để làm rõ đơn hàng, phiên thanh toán và giao dịch. Đối chiếu glossary hiện có và lưu các quyết định thiết kế cần giữ lâu dài.",
+    "related": [
+      "grilling",
+      "domain-modeling"
+    ]
+  },
+  {
+    "id": "domain-modeling",
+    "group": "design",
+    "title": "Thống nhất thuật ngữ và quyết định của miền",
+    "about": "Xây dựng ngôn ngữ dùng chung trong CONTEXT.md và ghi quyết định kiến trúc theo định dạng ADR của repository.",
+    "when": "Một khái niệm bị gọi bằng nhiều tên, tên trong code gây nhầm lẫn hoặc quyết định thiết kế cần được lưu với lý do.",
+    "input": "Thuật ngữ đang mơ hồ, nguồn nghiệp vụ, code liên quan và glossary hoặc ADR hiện có.",
+    "steps": [
+      "Đọc mô hình hiện tại và tìm khái niệm cần phân biệt.",
+      "Thống nhất định nghĩa và cách dùng thuật ngữ.",
+      "Cập nhật CONTEXT.md hoặc ADR theo tiêu chí của skill."
+    ],
+    "output": "Mô hình miền rõ hơn, với một nơi sở hữu thuật ngữ và quyết định.",
+    "note": "Tra nghĩa thuật ngữ đã có thường chỉ cần đọc. Skill này dành cho xây dựng hoặc thay đổi mô hình.",
+    "prompt": "Dùng skill domain-modeling để phân biệt invoice và payment trong module billing. Đối chiếu hành vi và thuật ngữ đã chấp thuận, rồi cập nhật glossary sau khi thống nhất nghĩa.",
+    "related": [
+      "codebase-design",
+      "grill-with-docs"
+    ]
+  },
+  {
+    "id": "codebase-design",
+    "group": "design",
+    "title": "Thiết kế module có giao diện dễ dùng",
+    "about": "Nguyên tắc thiết kế deep module: nhiều hành vi hữu ích nằm sau một interface mà người gọi cần học ít.",
+    "when": "Cần thiết kế interface, xác định điểm thay thế hành vi hoặc làm module dễ thay đổi và kiểm thử.",
+    "input": "Module, các nơi gọi, phụ thuộc, trường hợp sử dụng và ràng buộc đã thống nhất.",
+    "steps": [
+      "Mô tả module, interface, seam và adapter bằng từ vựng chung.",
+      "Xem độ phức tạp nào có thể giữ bên trong module.",
+      "So sánh thiết kế bằng ích lợi của interface, tính tập trung của thay đổi và khả năng test."
+    ],
+    "output": "Lập luận thiết kế và phương án interface; tài liệu đi kèm hỗ trợ thiết kế nhiều phương án độc lập.",
+    "note": "Interface gồm cả thứ tự gọi, lỗi, cấu hình và các điều kiện cần biết. Số dòng code không đo được độ sâu của module.",
+    "prompt": "Dùng skill codebase-design để đánh giá interface của module lưu trữ. Chỉ ra điều người gọi phải biết, nơi thay được adapter và đề xuất hai phương án với trade-off rõ ràng.",
+    "related": [
+      "improve-codebase-architecture",
+      "tdd"
+    ]
+  },
+  {
+    "id": "improve-codebase-architecture",
+    "group": "design",
+    "explicit": true,
+    "title": "Tìm điểm đáng cải tổ bằng báo cáo HTML",
+    "about": "Khảo sát module gây khó khăn, ưu tiên khu vực hay thay đổi, rồi đề xuất cơ hội làm interface đơn giản và hữu ích hơn.",
+    "when": "Muốn biết nên cải tổ kiến trúc ở đâu để bảo trì và kiểm thử dễ hơn.",
+    "input": "Khu vực hoặc điểm đau cụ thể; nếu chưa có, skill dùng lịch sử commit để tìm nơi đáng khảo sát.",
+    "steps": [
+      "Đọc mô hình miền, ADR và codebase-design; khảo sát điểm gây khó khăn.",
+      "Tạo HTML với vấn đề, phương án, hình trước/sau và mức khuyến nghị.",
+      "Sau khi bạn chọn ứng viên, dùng grilling để làm rõ thiết kế tiếp theo."
+    ],
+    "output": "Báo cáo HTML trong thư mục tạm của hệ điều hành và thảo luận về ứng viên được chọn.",
+    "note": "Bước đầu tìm cơ hội cải tổ, chưa tự triển khai refactor hay chốt interface.",
+    "prompt": "Dùng skill improve-codebase-architecture để khảo sát module import dữ liệu, ưu tiên file thay đổi nhiều gần đây. Tạo báo cáo HTML có hình trước/sau và mức độ đáng làm.",
+    "related": [
+      "codebase-design",
+      "grilling"
+    ]
+  },
+  {
+    "id": "prototype",
+    "group": "design",
+    "title": "Thử câu hỏi thiết kế bằng bản mẫu",
+    "about": "Tạo code để học nhanh: thử trạng thái bằng HTML tương tác hoặc so sánh nhiều phương án giao diện.",
+    "when": "Chưa chắc chuyển trạng thái có hợp lý hoặc cần nhìn các hướng UI trước khi chọn.",
+    "input": "Một câu hỏi cụ thể, nhánh logic hoặc UI và tình huống muốn thử.",
+    "steps": [
+      "Xác định câu hỏi thuộc logic/trạng thái hay giao diện.",
+      "Tạo bản mẫu dễ chạy, làm lộ trạng thái hoặc khác biệt giữa các phương án.",
+      "Ghi câu trả lời và giữ quyết định đã kiểm chứng theo quy trình skill."
+    ],
+    "output": "Nhánh logic: một HTML chia sẻ được. Nhánh UI: các biến thể trên cùng route, đổi bằng tham số URL.",
+    "note": "Code dùng một lần để trả lời câu hỏi, mặc định không lưu trạng thái. Skill có bước lưu prototype ở nhánh thử nghiệm ngoài main.",
+    "prompt": "Dùng skill prototype, nhánh logic, tạo HTML để thử trạng thái chờ, đang chạy, lỗi và thử lại của hàng đợi. Câu hỏi: người dùng có thể khôi phục tác vụ mà không chạy trùng không?",
+    "related": [
+      "codebase-design"
+    ]
+  },
+  {
+    "id": "implement",
+    "group": "build",
+    "explicit": true,
+    "title": "Triển khai từ spec hoặc ticket đã rõ",
+    "about": "Thực hiện phần việc trong đặc tả, kiểm tra thường xuyên, review sau khi xong và commit trên nhánh hiện tại.",
+    "when": "Yêu cầu đủ rõ để viết code; phạm vi và hành vi cần đạt đã được thống nhất.",
+    "input": "Spec hoặc ticket, phạm vi chỉnh sửa, interface kiểm thử và yêu cầu về commit.",
+    "steps": [
+      "Triển khai theo spec, dùng tdd tại interface đã thống nhất khi phù hợp.",
+      "Chạy typecheck và test nhỏ thường xuyên, bộ test đầy đủ ở cuối.",
+      "Dùng code-review để đánh giá rồi commit công việc."
+    ],
+    "output": "Code, kiểm chứng, kết quả review và commit theo quy trình skill.",
+    "note": "Skill có bước commit. Hãy nêu ràng buộc về Git trong yêu cầu; chỉ dẫn của người dùng vẫn cần được tôn trọng.",
+    "prompt": "Dùng skill implement để thực hiện \u003cspec>. Phạm vi: \u003cmodule>; interface kiểm thử đã chốt: \u003cinterface>. Chạy kiểm tra của repo, review theo spec và commit phần việc trên nhánh hiện tại.",
+    "related": [
+      "tdd",
+      "code-review"
+    ]
+  },
+  {
+    "id": "diagnosing-bugs",
+    "group": "build",
+    "title": "Tìm nguyên nhân bằng vòng tái hiện lỗi",
+    "about": "Bắt đầu từ tín hiệu pass/fail thật sự bắt được triệu chứng, rồi dùng nó để thu hẹp và kiểm tra giả thuyết về lỗi hoặc suy giảm hiệu năng.",
+    "when": "Debug hành vi lỗi, crash, kết quả sai, hiện tượng chậm hoặc regression khó giải thích.",
+    "input": "Triệu chứng chính xác, đầu vào gây lỗi, hành vi mong đợi, log đã che dữ liệu nhạy cảm và môi trường tái hiện.",
+    "steps": [
+      "Xây dựng và chạy vòng tái hiện nhanh, đủ nhạy với lỗi đang báo.",
+      "Thu nhỏ trường hợp, kiểm tra giả thuyết và bổ sung quan sát có mục đích.",
+      "Khi được yêu cầu sửa, sửa tối thiểu rồi chạy lại và dọn instrumentation tạm."
+    ],
+    "output": "Lệnh tái hiện đã chạy, bằng chứng nguyên nhân và kết quả kiểm tra; bản sửa nếu trong yêu cầu.",
+    "note": "Chưa tạo được vòng tái hiện thì nói rõ các cách đã thử và điều kiện còn thiếu. Yêu cầu chỉ chẩn đoán vẫn là phạm vi chỉ đọc của repo.",
+    "prompt": "Dùng skill diagnosing-bugs để tìm và sửa lỗi xuất CSV làm mất dòng cuối trong \u003cmodule>. Đầu vào: \u003cfixture>; kỳ vọng: \u003cmô-tả>. Chứng minh vòng tái hiện bắt được lỗi trước và hết lỗi sau khi sửa.",
+    "related": [
+      "tdd",
+      "code-review"
+    ]
+  },
+  {
+    "id": "tdd",
+    "group": "build",
+    "title": "Xây hành vi bằng từng vòng test trước",
+    "about": "Viết một test thất bại qua public interface, thêm code đủ để test qua rồi lặp lại theo từng lát hành vi.",
+    "when": "Triển khai tính năng hoặc sửa lỗi theo test-first, cần bảo vệ hành vi qua các lần refactor.",
+    "input": "Hành vi đã chấp thuận, ví dụ đầu vào/đầu ra độc lập và interface kiểm thử đã thống nhất.",
+    "steps": [
+      "Chốt interface và phạm vi test với người dùng.",
+      "Viết một test, quan sát thất bại vì đúng lý do.",
+      "Thêm code tối thiểu để test qua, lặp từng hành vi và đưa refactor sang review."
+    ],
+    "output": "Code có test hành vi phát hiện lỗi thực tế, ít phụ thuộc cài đặt bên trong.",
+    "note": "Skill yêu cầu thống nhất điểm đặt test trước khi viết. Không viết toàn bộ test giả định rồi mới triển khai cả khối.",
+    "prompt": "Dùng skill tdd để thêm kiểm tra mã giảm giá hết hạn. Interface đã chốt: applyCoupon(cart, coupon, now). Dùng ví dụ từ \u003cspec>; mỗi vòng chỉ thêm một test và phần code đủ để test qua.",
+    "related": [
+      "codebase-design",
+      "code-review"
+    ]
+  },
+  {
+    "id": "code-review",
+    "group": "build",
+    "title": "Review theo chuẩn code và đặc tả",
+    "about": "Hai trục độc lập: Standards kiểm tra chuẩn repository; Spec kiểm tra yêu cầu gốc có được thực hiện đúng không.",
+    "when": "Review nhánh, PR hoặc phần việc đang làm so với một commit, tag hay nhánh gốc.",
+    "input": "Mốc so sánh hợp lệ và nguồn spec; nếu không có spec thì nói rõ.",
+    "steps": [
+      "Chốt merge-base, lấy diff cả thay đổi chưa commit và nội dung file untracked trong phạm vi.",
+      "Xác định tài liệu chuẩn code và đặc tả.",
+      "Chạy hai trục review độc lập, trình bày riêng và nêu giới hạn."
+    ],
+    "output": "Hai báo cáo Standards và Spec, phân biệt vi phạm quy định với nhận xét theo heuristic.",
+    "note": "Review chỉ đọc. Thiếu spec thì bỏ trục Spec và báo rõ. Code smell là nhận định, không tự thành chính sách.",
+    "prompt": "Dùng skill code-review để review thay đổi so với main, gồm phần chưa commit. Spec ở \u003cđường-dẫn>. Trình bày Standards và Spec riêng, dẫn nguồn từng nhận xét và không sửa file.",
+    "related": [
+      "implement",
+      "smart-commits"
+    ]
+  },
+  {
+    "id": "encode-invariant",
+    "group": "build",
+    "title": "Biến quy tắc đã chấp thuận thành kiểm tra",
+    "about": "Đưa một ràng buộc kiến trúc, độ tin cậy, bảo mật hoặc chất lượng đã có thẩm quyền thành kiểm tra cơ học nhỏ nhất phù hợp repository.",
+    "when": "Có quy tắc rõ ràng cần thực thi hoặc cần ngăn vi phạm đã xác định tái diễn.",
+    "input": "Nguồn quy tắc đã chấp thuận, phạm vi, công cụ kiểm tra hiện có và điều kiện pass/fail.",
+    "steps": [
+      "Đọc nguồn quy định, xác minh phạm vi không còn mơ hồ.",
+      "Bổ sung kiểm tra tại nơi sở hữu validation sẵn có.",
+      "Chứng minh trường hợp được phép qua và vi phạm bị bắt; báo mức thực thi."
+    ],
+    "output": "Kiểm tra có thông báo hướng xử lý, bằng chứng dương/âm và mức local/CI/merge được xác minh.",
+    "note": "Không suy chính sách từ code hay test. Cài hook, đổi CI hoặc branch protection cần nằm trong phạm vi được cho phép riêng.",
+    "prompt": "Dùng skill encode-invariant để thực thi quy tắc tại \u003cfile:mục>: \u003cquy-tắc-đã-chấp-thuận>. Dùng validation hiện có, chứng minh cả pass và fail; lần này chỉ làm kiểm tra local.",
+    "related": [
+      "improve-harness",
+      "tdd"
+    ]
+  },
+  {
+    "id": "prompt-leverage",
+    "group": "collaborate",
+    "title": "Nâng yêu cầu thô thành prompt rõ việc",
+    "about": "Giữ mục tiêu gốc và bổ sung cấu trúc vừa đủ: ngữ cảnh, cách làm, công cụ, đầu ra, kiểm chứng và điều kiện hoàn thành.",
+    "when": "Prompt mơ hồ, thiếu định nghĩa xong việc hoặc cần một mẫu dùng lại.",
+    "input": "Prompt nguyên bản, đối tượng sử dụng, ràng buộc và dạng đầu ra.",
+    "steps": [
+      "Nhận diện công việc thực sự và loại nhiệm vụ.",
+      "Bổ sung các khối còn thiếu theo framework, giữ ý định gốc.",
+      "Trả prompt cải tiến, lý do thay đổi hoặc template theo yêu cầu."
+    ],
+    "output": "Prompt dùng ngay; hỗ trợ tách template và đặc tả hook khi được yêu cầu.",
+    "note": "Prompt đã rõ chỉ cần chỉnh ít. Script augment_prompt.py hỗ trợ dựng cấu trúc xác định; đặc tả hook không tự cài hook.",
+    "prompt": "Dùng skill prompt-leverage để cải thiện prompt: \"đọc code rồi tối ưu import\". Giữ mục tiêu, làm rõ dữ liệu cần đo, phạm vi và điều kiện hoàn thành; trả prompt cùng lý do chỉnh sửa.",
+    "related": [
+      "grilling"
+    ]
+  },
+  {
+    "id": "writing-for-agents",
+    "group": "collaborate",
+    "title": "Viết chỉ dẫn mà agent đọc đúng lúc",
+    "about": "Nguyên tắc viết tài liệu cho agent: đường dẫn có điều kiện kích hoạt rõ, thông tin đúng tầng và tiêu chí hoàn thành kiểm tra được.",
+    "when": "Tạo hoặc sửa skill, AGENTS.md, CLAUDE.md hay tài liệu hướng dẫn cho agent.",
+    "input": "Đối tượng đọc, hành vi cần thay đổi, tài liệu hiện tại, nguồn quy định và điểm thường hiểu sai.",
+    "steps": [
+      "Phân biệt nội dung luôn cần đọc với nội dung chỉ cần ở một nhánh.",
+      "Viết bước có tiêu chí hoàn thành; đặt định nghĩa, quy tắc và ví dụ cạnh nhau.",
+      "Lược trùng lặp, chỉnh đường dẫn kích hoạt; viết skill thì đọc thêm SKILL-MECHANICS.md."
+    ],
+    "output": "Hướng dẫn gọn, có cấu trúc để agent tìm đúng nguồn và biết khi nào xong bước.",
+    "note": "Thêm tài liệu tăng chi phí ngữ cảnh hoặc ghi nhớ. Sửa Harness để khắc phục vướng mắc lặp lại đi qua yêu cầu $improve-harness.",
+    "prompt": "Dùng skill writing-for-agents để sửa \u003ctài-liệu> theo thay đổi đã chốt: \u003cdanh-sách>. Giữ một nguồn cho mỗi quy tắc, làm rõ lúc cần đọc và tiêu chí hoàn thành từng bước.",
+    "related": [
+      "prompt-leverage",
+      "improve-harness"
+    ]
+  },
+  {
+    "id": "to-questionnaire",
+    "group": "collaborate",
+    "explicit": true,
+    "title": "Soạn bảng hỏi cho người giữ thông tin",
+    "about": "Biến phần kiến thức hoặc quyết định bạn chưa có thành Markdown để người phù hợp trả lời bất đồng bộ hoặc trong cuộc họp.",
+    "when": "Cần hỏi khách hàng, chuyên gia hoặc đồng nghiệp trước khi quyết định bước tiếp theo.",
+    "input": "Người nhận là ai, họ biết gì và dữ kiện hoặc quyết định bạn cần nhận lại.",
+    "steps": [
+      "Làm rõ vai trò người nhận và khoảng cách kiến thức.",
+      "Chốt điều cần biết hoặc quyết định sau khi nhận trả lời.",
+      "Viết câu quan trọng trước, mỗi câu một ý và có chỗ trả lời."
+    ],
+    "output": "File to-questionnaire-\u003cchủ-đề>.md trong thư mục hiện tại.",
+    "note": "Skill soạn bảng hỏi; gửi cho người khác là hành động riêng.",
+    "prompt": "Dùng skill to-questionnaire để soạn bảng hỏi cho trưởng bộ phận vận hành. Tôi cần biết tải giờ cao điểm, thời gian gián đoạn chấp nhận được và quy trình phục hồi để chốt thiết kế.",
+    "related": [
+      "grilling"
+    ]
+  },
+  {
+    "id": "handoff",
+    "group": "collaborate",
+    "explicit": true,
+    "title": "Bàn giao ngữ cảnh cho phiên tiếp theo",
+    "about": "Cô đọng cuộc trò chuyện thành tài liệu để agent mới tiếp tục đúng mục tiêu, quyết định và phần việc còn lại.",
+    "when": "Sắp đổi phiên, đổi agent hoặc chuyển sang giai đoạn cần tập trung khác.",
+    "input": "Mục tiêu phiên sau và ngữ cảnh hiện tại.",
+    "steps": [
+      "Tóm tắt mục tiêu, trạng thái và quyết định còn hiệu lực.",
+      "Dẫn spec, plan, commit và diff; nêu skill phù hợp cho phiên sau.",
+      "Che thông tin nhạy cảm và ghi tài liệu vào thư mục tạm hệ điều hành."
+    ],
+    "output": "File handoff trong thư mục tạm, có tham chiếu nguồn gốc thông tin.",
+    "note": "Không chép lại toàn bộ artifact đã có. File handoff không nằm trong workspace.",
+    "prompt": "Dùng skill handoff để bàn giao cho phiên sau tập trung kiểm thử update. Ghi việc đã xong, bằng chứng đã có, phần chưa xác minh và skill nên gọi.",
+    "related": [
+      "code-review"
+    ]
+  },
+  {
+    "id": "wait-what",
+    "group": "collaborate",
+    "explicit": true,
+    "title": "Giải thích lại khi bạn mất mạch",
+    "about": "Yêu cầu agent trình bày lại thông điệp vừa rồi với ngữ cảnh và ngôn ngữ đơn giản, dùng đúng thuật ngữ dự án.",
+    "when": "Câu trả lời khó hiểu, nhảy bước hoặc bạn không rõ agent đang đi đến đâu.",
+    "input": "Thông điệp vừa chưa rõ; có thể chỉ ra chỗ khó hiểu.",
+    "steps": [
+      "Khôi phục ngữ cảnh cần thiết.",
+      "Diễn đạt lại bằng ngôn ngữ kỹ thuật đơn giản.",
+      "Dùng CONTEXT.md; theo CONTEXT-MAP.md nếu có nhiều glossary."
+    ],
+    "output": "Lời giải thích lại dễ theo dõi hơn trong cuộc trò chuyện.",
+    "note": "Bản gốc yêu cầu ASD-STE100 Simplified Technical English. Muốn tiếng Việt thì nêu rõ trong yêu cầu.",
+    "prompt": "Dùng skill wait-what. Giải thích lại bằng tiếng Việt đơn giản vì tôi chưa hiểu tại sao đổi interface làm test ổn định hơn. Giữ đúng thuật ngữ của dự án.",
+    "related": [
+      "codebase-design"
+    ]
+  },
+  {
+    "id": "teach",
+    "group": "collaborate",
+    "explicit": true,
+    "title": "Học một chủ đề qua nhiều phiên",
+    "about": "Tổ chức việc học quanh mục tiêu cá nhân, bài học HTML ngắn và thực hành có phản hồi; lưu tiến trình trong workspace học tập.",
+    "when": "Muốn học sâu qua nhiều buổi, với bài tập vừa trình độ.",
+    "input": "Chủ đề, lý do cần học, kiến thức hiện có và workspace dành cho học tập.",
+    "steps": [
+      "Xác định mục tiêu trong MISSION.md và thu thập nguồn đáng tin.",
+      "Tạo bài học HTML tập trung vào một năng lực luyện ngay được.",
+      "Ghi điều đã học, tài liệu tra cứu và tiến trình để điều chỉnh phiên sau."
+    ],
+    "output": "MISSION.md, lessons/, reference/, RESOURCES.md, learning-records/ và tài nguyên liên quan.",
+    "note": "Có lưu trạng thái và có thể tạo nhiều file trong thư mục hiện tại. Nên chỉ rõ workspace học tập.",
+    "prompt": "Dùng skill teach trong workspace \u003cđường-dẫn> để dạy tôi thiết kế public interface trong Go. Mục tiêu: tự viết test hành vi cho CLI; bắt đầu từ trình độ hiện tại của tôi.",
+    "related": [
+      "research",
+      "codebase-design"
+    ]
+  },
+  {
+    "id": "smart-commits",
+    "group": "operate",
+    "title": "Chia thay đổi thành commit hợp lý",
+    "about": "Đọc working tree và nhóm thay đổi theo ý định để tạo commit dễ review và dễ hiểu lịch sử.",
+    "when": "Đã có code hoặc tài liệu cần commit, nhất là working tree chứa nhiều chủ đề.",
+    "input": "Phạm vi cần commit, phần cần giữ nguyên và yêu cầu push nếu có.",
+    "steps": [
+      "Đọc diff staged, unstaged và file mới để hiểu phạm vi.",
+      "Nhóm theo mục đích, chạy kiểm tra phù hợp, stage đúng file hoặc hunk.",
+      "Commit lần lượt; chỉ push nếu yêu cầu cho lần gọi này nêu rõ."
+    ],
+    "output": "Một hoặc nhiều commit rõ mục đích, kết quả kiểm tra và phần chưa commit còn lại.",
+    "note": "Dành cho công việc đã tồn tại. Không tự sửa code để dễ commit; “commit mọi thứ” chưa phải yêu cầu push.",
+    "prompt": "Dùng skill smart-commits để nhóm và commit thay đổi hiện tại theo mục đích. Giữ nguyên phần ngoài \u003cphạm-vi>, chạy kiểm tra phù hợp và không push.",
+    "related": [
+      "code-review"
+    ]
+  },
+  {
+    "id": "resolving-merge-conflicts",
+    "group": "operate",
+    "title": "Giải quyết merge hoặc rebase đang xung đột",
+    "about": "Đọc ý định hai phía, giải quyết từng hunk và hoàn tất tiến trình Git với kiểm tra của dự án.",
+    "when": "Repository đang giữa một merge hoặc rebase có conflict.",
+    "input": "Mục tiêu merge/rebase và lựa chọn đã chốt nếu hai phía không tương thích.",
+    "steps": [
+      "Đọc trạng thái Git, lịch sử và nguồn quyết định của mỗi phía.",
+      "Giải từng hunk, giữ cả hai ý định khi có thể và nêu trade-off.",
+      "Chạy kiểm tra, stage đúng phạm vi, hoàn tất merge hoặc tiếp tục rebase đến hết."
+    ],
+    "output": "Conflict được giải quyết và tiến trình hoàn tất, kèm validation.",
+    "note": "Có sửa file và tiến trình Git. Skill hướng tới hoàn tất thao tác dở, bảo toàn thay đổi không liên quan có sẵn.",
+    "prompt": "Dùng skill resolving-merge-conflicts để hoàn tất rebase đang dở. Mục tiêu: đưa nhánh lên main, giữ hành vi trong \u003cspec>. Chạy kiểm tra và nêu lựa chọn không thể giữ cả hai phía.",
+    "related": [
+      "code-review"
+    ]
+  },
+  {
+    "id": "find-skills",
+    "group": "operate",
+    "title": "Tìm skill bổ sung từ hệ sinh thái",
+    "about": "Tìm skill ngoài repository cho nhu cầu cụ thể, kiểm tra nguồn và tín hiệu chất lượng trước khi giới thiệu cách cài.",
+    "when": "Cần khả năng chưa có trong bộ hiện tại và muốn tìm skill cài thêm.",
+    "input": "Lĩnh vực, nhiệm vụ, môi trường và phạm vi cài mong muốn.",
+    "steps": [
+      "Làm rõ nhu cầu, tìm trên skills.sh hoặc Skills CLI.",
+      "Kiểm tra nguồn, mức sử dụng và tín hiệu chất lượng theo skill.",
+      "Trình bày lựa chọn và lệnh cài; cài khi người dùng yêu cầu."
+    ],
+    "output": "Lựa chọn có nguồn và lệnh cài; có thể thực hiện cài trong phạm vi được yêu cầu.",
+    "note": "Cần mạng; npx cần Node.js. Độ phổ biến là tín hiệu tham khảo, chưa chứng minh skill phù hợp dự án.",
+    "prompt": "Dùng skill find-skills để tìm skill kiểm thử accessibility cho web. Kiểm tra nguồn và nội dung trước khi đề xuất; hiện tại chỉ trả lựa chọn và cách cài.",
+    "related": [
+      "research"
+    ]
+  },
+  {
+    "id": "herdr",
+    "group": "operate",
+    "explicit": true,
+    "title": "Điều khiển terminal và agent trong Herdr",
+    "about": "Dùng CLI Herdr để xem workspace, tab, pane và trạng thái agent, hoặc điều khiển trong phiên Herdr quản lý.",
+    "when": "Đang dùng Herdr và muốn kiểm tra hoặc điều khiển pane, lệnh hay agent cụ thể.",
+    "input": "Yêu cầu nhắc rõ Herdr, phiên trong pane Herdr với HERDR_ENV=1 và mục tiêu thao tác.",
+    "steps": [
+      "Kiểm tra HERDR_ENV=1 và help của binary đang cài.",
+      "Lấy ID và trạng thái thật của đối tượng.",
+      "Thực hiện thao tác đúng đối tượng và kiểm tra kết quả."
+    ],
+    "output": "Thông tin phiên hoặc kết quả điều khiển theo yêu cầu.",
+    "note": "Chỉ dùng khi người dùng nhắc rõ Herdr. Không ở trong Herdr thì dừng; trạng thái idle/done không chứng minh nhiệm vụ đã đúng.",
+    "prompt": "Dùng skill herdr để liệt kê pane và trạng thái agent trong phiên Herdr hiện tại. Chỉ kiểm tra; chưa gửi lệnh, tạo pane hay dừng tiến trình.",
+    "related": [
+      "handoff"
+    ]
+  },
+  {
+    "id": "tldraw-api",
+    "group": "operate",
+    "title": "Vẽ và kiểm chứng sơ đồ trong tldraw",
+    "about": "Thao tác canvas tldraw Desktop qua API localhost có xác thực, từ đọc shape và nối mũi tên đến lưu và kiểm tra bố cục.",
+    "when": "Tự động hóa sơ đồ .tldraw, cập nhật kiến trúc hoặc sửa bố cục trong Desktop đang cài.",
+    "input": "tldraw Desktop đang chạy và có tài liệu mở, mục tiêu và file đích; wrapper cần curl và jq.",
+    "steps": [
+      "Liệt kê tài liệu, đọc shape và binding của canvas đích.",
+      "Chỉnh qua exec hoặc script workspace, giữ phần không liên quan.",
+      "Lưu qua ứng dụng; kiểm tra shape, binding, lint và screenshot."
+    ],
+    "output": "Canvas hoặc file .tldraw được cập nhật, lưu và kiểm chứng.",
+    "note": "Không sửa trực tiếp archive .tldraw đang mở. exec đổi editor sống; save mới ghi xuống file.",
+    "prompt": "Dùng skill tldraw-api để cập nhật \u003ctài-liệu-đang-mở>: thêm luồng CLI → target → install → provenance. Đọc canvas trước, giữ phần không liên quan, lưu và kiểm tra binding cùng screenshot.",
+    "related": [
+      "codebase-design"
+    ]
+  },
+  {
+    "id": "wizard",
+    "group": "operate",
+    "title": "Tạo script dẫn qua các bước thủ công",
+    "about": "Soạn wizard Bash từ template để hướng dẫn con người làm bước agent không thể tự hoàn thành, như lấy giá trị trên dashboard riêng.",
+    "when": "Thiết lập dịch vụ, credentials hoặc chuyển đổi cần thao tác của người có quyền truy cập.",
+    "input": "Quy trình, bước thủ công, giá trị cần lấy, nơi ghi và tài liệu xác minh.",
+    "steps": [
+      "Chốt thứ tự bước và nơi nhận/lưu từng giá trị.",
+      "Viết stage từ template, dùng nhập ẩn cho secret.",
+      "Kiểm tra cú pháp Bash, shellcheck khi có và bàn giao lệnh chạy."
+    ],
+    "output": "Script Bash tương tác có tiến trình, nhập liệu và xác nhận từng bước.",
+    "note": "Agent kiểm tra tĩnh rồi bàn giao, không chạy toàn bộ thay con người. Khi chạy, script có thể ghi .env hoặc secret theo phạm vi đã chốt.",
+    "prompt": "Dùng skill wizard để tạo script dẫn tôi lấy cấu hình dashboard theo \u003crunbook>. Liệt kê bước và nơi ghi giá trị trước, nhập ẩn secret và chỉ kiểm tra tĩnh script.",
+    "related": [
+      "to-questionnaire"
+    ]
+  },
+  {
+    "id": "improve-harness",
+    "group": "harness",
+    "explicit": true,
+    "title": "Sửa điểm vướng bằng thử nghiệm có thể so sánh",
+    "about": "Từ lần agent bị vướng đã quan sát, tìm chỗ thiếu sớm nhất, sửa nhỏ đúng nơi và so sánh bằng lần chạy mới tương đương.",
+    "when": "Có bằng chứng điểm vướng lặp lại và người dùng chủ động muốn cải thiện hướng dẫn, công cụ, runbook hoặc validation.",
+    "input": "Lần chạy gốc, thất bại, can thiệp của con người, revision và điều kiện có thể giữ tương đương.",
+    "steps": [
+      "Lưu baseline vào kế hoạch cải tiến và tìm chủ sở hữu khoảng trống.",
+      "Nêu giả thuyết, áp dụng một thay đổi nhỏ và chạy kiểm tra native.",
+      "Cho agent mới làm việc tương đương; chọn keep, revise hoặc remove theo bằng chứng."
+    ],
+    "output": "Thay đổi được kiểm chứng và bản ghi quyết định, hoặc pending fresh rerun khi chưa chạy lại.",
+    "note": "Chỉ kích hoạt khi người dùng gọi rõ $improve-harness. Chưa có baseline thì đề xuất thử nghiệm; chưa chạy lại thì chưa khẳng định Harness tốt hơn.",
+    "prompt": "$improve-harness: Trong \u003ctranscript>, agent không tìm thấy lệnh test đã ghi ở \u003cnguồn>, khiến tôi phải chỉ lại. Giữ baseline, tìm khoảng trống sớm nhất và kiểm tra một sửa đổi nhỏ bằng phiên agent mới.",
+    "related": [
+      "writing-for-agents",
+      "encode-invariant"
+    ]
+  }
+]
+</script>
+<script id="deep-dive-data" type="application/json">
+{
+  "onboard-repository": {
+    "plain": "Đây là quy trình tiếp nhận một codebase chưa quen. Nó giúp agent đi từ “tôi có một thư mục source code” đến “tôi biết nguồn nào có thẩm quyền, một luồng thật chạy qua đâu, và điều gì vẫn chưa được xác minh”.",
+    "analogy": "Giống ngày đầu của một kỹ sư mới: trước khi sửa sản phẩm, họ cần sơ đồ dự án, cách chạy, người sở hữu quyết định và một luồng thực tế để kiểm tra hiểu biết.",
+    "flow": [
+      "Chụp trạng thái ban đầu của Git, worktree, file được quản lý và môi trường quan sát được.",
+      "Đọc hướng dẫn, tài liệu sản phẩm, code, test và cấu hình liên quan tới luồng được chọn.",
+      "Lần theo luồng từ điểm vào tới kết quả; mỗi nhận định được gắn nhãn authoritative, observed, derived, unknown hoặc decision required.",
+      "Xuất bản đồ cùng bản vá tài liệu đề xuất. Lượt sau mới áp dụng đúng những mục người dùng đã duyệt."
+    ],
+    "example": "Với dự án bán hàng, agent có thể lần theo “tạo đơn hàng” từ HTTP route, qua validation và domain operation, tới nơi lưu database và test. Nếu README thiếu lệnh test nhưng package manifest có định nghĩa rõ, agent đề xuất chính xác đoạn tài liệu cần thêm và dẫn nguồn.",
+    "compare": "Khác research ở chỗ đối tượng chính là repository và một luồng vận hành của nó. Khác audit-onboarding-proposal ở chỗ skill này tạo đề xuất; audit kiểm tra đề xuất ấy bằng một phiên độc lập.",
+    "remember": "Đầu ra tốt luôn trả lời được: “Tôi biết điều này dựa vào đâu?” Lượt đầu chỉ khảo sát, không tự sửa những gì vừa phát hiện."
+  },
+  "audit-onboarding-proposal": {
+    "plain": "Đây là lớp kiểm toán độc lập cho kết quả onboarding. Nó không tin lời kể của agent đã khảo sát; nó tái dựng từng khẳng định từ transcript, revision và repository thật.",
+    "analogy": "Giống reviewer kiểm tra hồ sơ khảo sát trước khi cho phép dùng nó làm hướng dẫn chính thức.",
+    "flow": [
+      "Chạy trong phiên mới, nhận transcript thô, digest kỳ vọng, repository, revision và bản vá chính xác.",
+      "Xác minh transcript chưa bị thay đổi và capsule bằng chứng hợp lệ.",
+      "Tách từng hunk thành các mệnh đề nhỏ, đối chiếu từng mệnh đề với nguồn ở revision đã chốt.",
+      "Kết luận theo từng hunk: đủ bằng chứng hay không; không tự áp dụng bản vá."
+    ],
+    "example": "Agent A đề xuất ghi “phải chạy migration trước mỗi lần start”. Agent B kiểm tra và thấy lệnh chỉ xuất hiện trong workflow CI, không có tài liệu nào áp dụng nó cho local development. Hunk bị kết luận PATCH_NO_APPLY vì đã mở rộng ngữ cảnh quá mức.",
+    "compare": "onboard-repository là người khảo sát và viết đề xuất. audit-onboarding-proposal là người kiểm tra độc lập. PATCH_APPLY chỉ nói nội dung đủ căn cứ để trình duyệt, không phải quyền sửa file.",
+    "remember": "Audit hỏi từng câu có được repository chứng minh hay không, không hỏi câu đó nghe có hợp lý hay không."
+  },
+  "research": {
+    "plain": "Skill này điều tra một câu hỏi bằng nguồn sơ cấp như tài liệu chính thức, tiêu chuẩn, source code hoặc API của chủ sở hữu, rồi nối từng kết luận về nguồn có thể kiểm tra.",
+    "analogy": "Giống viết một memo kỹ thuật: người đọc có thể lần ngược từ khuyến nghị về dữ kiện và giả định.",
+    "flow": [
+      "Chốt câu hỏi, phạm vi và tiêu chí so sánh.",
+      "Tìm nguồn sơ cấp; tách điều nguồn nói trực tiếp khỏi suy luận cho dự án.",
+      "Đối chiếu các nguồn và ghi rõ điều chưa biết hoặc phụ thuộc bối cảnh.",
+      "Trả lời trong chat, hoặc lưu một Markdown có trích dẫn khi người dùng yêu cầu lưu bền vững."
+    ],
+    "example": "Câu hỏi “SQLite hay PostgreSQL?” chỉ có ý nghĩa khi gắn với workload. Nếu hệ thống cần nhiều writer đồng thời, tài liệu về locking của SQLite trở thành bằng chứng liên quan; nếu chỉ có một tiến trình ghi cục bộ, khuyến nghị có thể đổi.",
+    "compare": "research tìm sự thật bên ngoài hoặc trong nguồn chính thức để trả lời một câu hỏi. onboard-repository xây bản đồ của một repository. Việc được phép nghiên cứu không tự cho phép tạo file.",
+    "remember": "Khuyến nghị phải gắn với nhu cầu cụ thể và giả định; độ phổ biến của một công nghệ không phải bằng chứng nó phù hợp."
+  },
+  "grilling": {
+    "plain": "Đây là một cuộc phỏng vấn theo cây quyết định. Nó làm lộ các lựa chọn đang ẩn trong một ý tưởng trước khi agent biến những giả định đó thành code.",
+    "analogy": "Giống một buổi design review có người điều phối: dữ kiện được tự đi tìm, còn quyết định được đặt đúng trước người có thẩm quyền.",
+    "flow": [
+      "Biến ý tưởng thành cây gồm các quyết định và quan hệ phụ thuộc.",
+      "Ở mỗi vòng, hỏi toàn bộ câu đã đủ tiền đề, gọi là frontier, và đưa khuyến nghị cho từng câu.",
+      "Dùng câu trả lời để mở các nhánh tiếp theo; agent tự tra mọi dữ kiện có thể tra.",
+      "Kết thúc khi frontier rỗng, hai bên xác nhận hiểu chung và ghi plan nếu công việc cần nhớ qua nhiều phiên."
+    ],
+    "example": "Với “thêm retry cho email”, vòng đầu làm rõ mục tiêu và phạm vi. Sau khi biết chỉ áp dụng cho email giao dịch, vòng sau mới hỏi lỗi nào retry, backoff, idempotency và trạng thái sau lần cuối.",
+    "compare": "prompt-leverage làm rõ cách diễn đạt khi ý định đã có. grilling dùng khi bản thân ý định còn thiếu quyết định. Nó chưa triển khai code.",
+    "remember": "Câu phụ thuộc một quyết định chưa chốt phải đợi vòng sau. Agent tìm facts; người dùng quyết định policy."
+  },
+  "grill-me": {
+    "plain": "Đây là router skill, một lối gọi ngắn để khởi động grilling. Nó không chứa phương pháp phỏng vấn riêng.",
+    "analogy": "Giống nút “bắt đầu design interview”: nút rất nhỏ, còn toàn bộ quy trình nằm ở grilling.",
+    "flow": [
+      "Người dùng gọi đích danh grill-me với một ý tưởng.",
+      "Skill chuyển agent tới hướng dẫn grilling.",
+      "Các vòng frontier, khuyến nghị và xác nhận hiểu chung diễn ra như grilling.",
+      "Kết quả được giữ trong chat hoặc plan tùy độ dài công việc."
+    ],
+    "example": "“/grill-me Tôi muốn tách hệ thống thành microservices” sẽ dẫn tới câu hỏi về nhóm triển khai, ownership dữ liệu, khả năng vận hành và vấn đề thực sự của monolith.",
+    "compare": "Kết quả gần như giống gọi grilling trực tiếp. grill-me tồn tại để con người có một lệnh dễ nhớ và không phải nạp thêm mô tả dài vào context thường trực.",
+    "remember": "grill-me là cửa vào; grilling mới là quy trình."
+  },
+  "grill-with-docs": {
+    "plain": "Router này gọi cả grilling và domain-modeling. Cuộc thảo luận vừa làm rõ lựa chọn, vừa đưa thuật ngữ và quyết định lâu dài về đúng tài liệu của repository.",
+    "analogy": "Giống design workshop có một người vừa điều phối câu hỏi, vừa giữ glossary và decision log đồng bộ.",
+    "flow": [
+      "Khởi động cây quyết định bằng grilling.",
+      "Khi xuất hiện khái niệm mới hoặc cách dùng từ mơ hồ, dùng domain-modeling để thống nhất nghĩa.",
+      "Khi một lựa chọn có hệ quả lâu dài và cần lý do, đánh giá việc ghi ADR.",
+      "Hoàn tất với thiết kế đã rõ và tài liệu miền phản ánh các quyết định đủ điều kiện."
+    ],
+    "example": "Khi thiết kế giữ phòng trước thanh toán, nhóm thống nhất Reservation Hold khác Booking: Hold khóa inventory 15 phút, Booking chỉ tồn tại khi được xác nhận. Glossary được cập nhật; quyết định lưu Hold trong database có thể thành ADR.",
+    "compare": "grill-me chỉ khởi động cuộc phỏng vấn. grill-with-docs phù hợp khi kết quả cần sống lâu hơn cuộc chat và sẽ thay đổi CONTEXT.md hoặc ADR.",
+    "remember": "Không phải mọi câu trả lời đều đáng thành ADR; chỉ lưu điều người sau cần biết cả lựa chọn lẫn lý do."
+  },
+  "domain-modeling": {
+    "plain": "Skill này xây ngôn ngữ chung cho nghiệp vụ: khái niệm nào tồn tại, chúng khác nhau ra sao, có quan hệ và vòng đời gì, và code nên dùng tên nào.",
+    "analogy": "Giống vẽ bản đồ nghĩa trước khi vẽ bản đồ code. Khi tên gọi chính xác, nhiều lỗi cấu trúc tự lộ ra.",
+    "flow": [
+      "Đọc CONTEXT.md, ADR, nguồn nghiệp vụ và code liên quan.",
+      "Tìm từ bị dùng cho nhiều nghĩa, nhiều từ chỉ cùng một thứ hoặc quan hệ chưa được nói rõ.",
+      "Thống nhất định nghĩa với người có thẩm quyền nghiệp vụ; không biến hành vi code thành policy.",
+      "Cập nhật glossary; ghi ADR khi cuộc thảo luận tạo ra một quyết định kiến trúc cần giữ lý do."
+    ],
+    "example": "Order, Checkout, Payment Attempt và Payment thường bị trộn. Mô hình rõ có thể chỉ ra một Order có nhiều Payment Attempt nhưng tối đa một Payment thành công, từ đó phát hiện giả định dữ liệu “một order bằng một payment” là sai.",
+    "compare": "Tra nghĩa của một từ đã được định nghĩa chỉ là đọc tài liệu. domain-modeling được dùng khi cần tạo, sửa hoặc phân biệt các khái niệm.",
+    "remember": "Code chứng minh hệ thống đang làm gì; nó không một mình chứng minh nghiệp vụ bắt buộc phải như vậy."
+  },
+  "codebase-design": {
+    "plain": "Đây là bộ từ vựng và nguyên tắc để thiết kế deep module: caller học một interface nhỏ nhưng nhận được nhiều hành vi hữu ích, trong khi độ phức tạp nằm bên trong.",
+    "analogy": "Một chiếc máy tốt có ít nút nhưng làm được công việc phức tạp; người dùng không phải thao tác từng bánh răng.",
+    "flow": [
+      "Liệt kê toàn bộ điều caller phải biết: chữ ký, thứ tự, lỗi, cấu hình, invariant và đặc tính hiệu năng.",
+      "Xác định seam nơi hành vi có thể thay đổi và adapter cụ thể nào đang ngồi ở đó.",
+      "Tìm độ phức tạp có thể tập trung bên trong module để tăng leverage và locality.",
+      "So sánh phương án bằng deletion test và khả năng test qua chính interface mà caller dùng."
+    ],
+    "example": "Thay vì caller tự walk payload, rewrite path, set executable mode và tạo CLAUDE.md, repository cung cấp target.Build(payload, \"claude\"). Một interface nhỏ che nhiều hành vi và test được qua output filesystem.",
+    "compare": "codebase-design dùng khi đã có một module hoặc interface cần suy nghĩ. improve-codebase-architecture đi tìm nơi nào trong codebase đáng được áp dụng tư duy này trước.",
+    "remember": "Depth không phải số dòng implementation chia số dòng interface. Depth là lượng giá trị caller nhận được trên lượng kiến thức họ phải mang."
+  },
+  "improve-codebase-architecture": {
+    "plain": "Skill này khảo sát codebase để tìm những module gây ma sát và xếp hạng cơ hội làm chúng sâu hơn, dễ test hơn và tập trung kiến thức hơn.",
+    "analogy": "Giống khám sức khỏe kiến trúc có ưu tiên: tìm điểm đau đang ảnh hưởng công việc thường xuyên, không liệt kê mọi khuyết điểm lý thuyết.",
+    "flow": [
+      "Nếu người dùng chưa chỉ vùng, đọc lịch sử commit để tìm hot spot thực sự còn được thay đổi.",
+      "Đọc CONTEXT.md, ADR, code và test tại vùng đó; dùng từ vựng của codebase-design.",
+      "Tạo báo cáo HTML, mỗi ứng viên có files, problem, solution, benefits, hình trước/sau và mức Strong, Worth exploring hoặc Speculative.",
+      "Người dùng chọn ứng viên; grilling mới bắt đầu chốt seam và interface. Bước báo cáo chưa refactor."
+    ],
+    "example": "Một thay đổi Order phải sửa controller, validator, service và event handler. Báo cáo có thể đề xuất tập trung vòng đời Order sau một interface, minh họa cách locality và test surface thay đổi.",
+    "compare": "Khác code-review vì đây không đánh giá một diff. Khác codebase-design vì nó tìm và ưu tiên ứng viên trước khi thiết kế interface.",
+    "remember": "Một module xấu nhưng không còn thay đổi có thể ít đáng đầu tư hơn một module hơi xấu bị sửa mỗi tuần."
+  },
+  "prototype": {
+    "plain": "Prototype là code dùng để trả lời một câu hỏi thiết kế, không phải phiên bản non trẻ của production. Câu hỏi quyết định prototype thuộc nhánh logic hay UI.",
+    "analogy": "Giống mô hình giấy của một sản phẩm: đủ thật để học từ việc sử dụng, đủ rẻ để bỏ khi đã có câu trả lời.",
+    "flow": [
+      "Viết rõ câu hỏi cần loại bỏ sự không chắc chắn.",
+      "Nếu hỏi về state/logic, tạo một HTML có hành động tự do, walkthrough và trạng thái đầy đủ. Nếu hỏi về UI, tạo nhiều phương án thực sự khác nhau trên cùng route.",
+      "Cho người dùng thử các trường hợp khó; mặc định giữ state trong memory và bỏ polish không phục vụ câu hỏi.",
+      "Đưa quyết định đã kiểm chứng vào sản phẩm; lưu prototype ngoài main như nguồn thử nghiệm nếu cần."
+    ],
+    "example": "Prototype hàng đợi cho phép bấm Start, Fail, Retry và Cancel, đồng thời hiện JSON state sau mỗi thao tác. Nó có thể chứng minh không cần trạng thái retrying riêng, chỉ cần running cộng attemptCount.",
+    "compare": "grilling khám phá bằng câu hỏi; prototype khám phá bằng trải nghiệm. implement xây sản phẩm thật sau khi câu hỏi đã được giải quyết.",
+    "remember": "Một lượng code nhỏ nên loại bỏ một sự không chắc chắn lớn. Nếu prototype tốn gần bằng production, câu hỏi chưa được thu hẹp đủ."
+  },
+  "implement": {
+    "plain": "Skill này biến một spec hoặc ticket đã rõ thành thay đổi hoàn chỉnh: code, kiểm tra, review và theo quy trình gốc là commit trên nhánh hiện tại.",
+    "analogy": "Đây là dây chuyền thi công sau khi bản vẽ đã được chốt; nó không phải nơi tự quyết định yêu cầu sản phẩm còn bỏ ngỏ.",
+    "flow": [
+      "Đọc spec, phạm vi, code và validation liên quan.",
+      "Triển khai theo từng phần; dùng TDD tại seam đã thống nhất khi phù hợp.",
+      "Chạy typecheck và test tập trung thường xuyên, rồi bộ test đầy đủ ở cuối.",
+      "Dùng code-review để đối chiếu Standards và Spec; commit nếu yêu cầu Git của phiên cho phép."
+    ],
+    "example": "Spec “mustang version in coreVersion ra stdout, không nhận positional argument và có help” đủ cụ thể để viết dispatch, test CLI, chạy go test và review từng yêu cầu.",
+    "compare": "tdd là phương pháp cho từng lát hành vi. implement bao trùm cả công việc theo spec. Nếu spec còn câu hỏi policy, grilling phải đi trước.",
+    "remember": "Implementation chỉ nên bắt đầu khi có thể nói rõ hành vi thành công và cách chứng minh nó."
+  },
+  "diagnosing-bugs": {
+    "plain": "Đây là phương pháp tìm nguyên nhân lỗi bằng một vòng phản hồi thật sự bắt được triệu chứng, rồi dùng vòng đó để kiểm tra từng giả thuyết.",
+    "analogy": "Giống thí nghiệm khoa học: trước hết phải có dụng cụ đo đáng tin, sau đó mới thay một biến và quan sát.",
+    "flow": [
+      "Tạo một lệnh nhanh, ổn định, agent tự chạy được và có thể đỏ trên đúng triệu chứng.",
+      "Thu nhỏ đầu vào hoặc tăng tỷ lệ tái hiện cho lỗi chập chờn.",
+      "Đặt giả thuyết có dự đoán quan sát được; thêm instrumentation có mục đích để bác bỏ hoặc củng cố.",
+      "Nếu yêu cầu gồm sửa, sửa tối thiểu và chạy lại đúng vòng ban đầu; dọn mọi instrumentation tạm."
+    ],
+    "example": "Lỗi CSV mất dòng cuối được thu từ 10.000 dòng xuống ranh giới page size 100. Thử nhiều page size cho thấy luôn mất phần tử đầu trang cuối, dẫn tới phép tính offset thay vì phỏng đoán về buffer.",
+    "compare": "diagnosing-bugs bắt đầu từ hành vi đang hỏng và tìm nguyên nhân. tdd bắt đầu từ hành vi cần xây. Yêu cầu “chẩn đoán” là read-only; “tìm và sửa” mới bao gồm implementation.",
+    "remember": "Không có vòng red-capable thì chưa có nền để tin một giả thuyết. “Chạy không crash” không phải tín hiệu cho lỗi sai dữ liệu."
+  },
+  "tdd": {
+    "plain": "TDD xây hành vi bằng từng vòng RED → GREEN: một test thất bại qua public interface, sau đó là lượng code tối thiểu để test ấy qua.",
+    "analogy": "Mỗi test là một cọc tiêu cho một lát hành vi. Ta đi tới từng cọc thay vì vẽ trước toàn bộ con đường tưởng tượng.",
+    "flow": [
+      "Thống nhất seam, tức public interface mà caller và test cùng sử dụng.",
+      "Viết một test với expected value độc lập; chạy và thấy nó đỏ vì đúng hành vi còn thiếu.",
+      "Viết code tối thiểu để xanh, rồi dùng điều vừa học cho test tiếp theo.",
+      "Giữ các lát theo chiều dọc; đưa việc refactor cấu trúc sang giai đoạn review theo quy trình skill."
+    ],
+    "example": "Với coupon hết hạn, test gọi ApplyCoupon(cart, coupon, now) và mong ErrCouponExpired từ ví dụ trong spec. Nó không kiểm tra private checkExpiry hay số lần một validator nội bộ được gọi.",
+    "compare": "diagnosing-bugs tìm nguyên nhân trước. implement quản lý toàn bộ feature. TDD chỉ tập trung vào vòng test trước tại seam đã được chốt.",
+    "remember": "Test tốt sống qua refactor vì nó kiểm tra hành vi, không kiểm tra cách implementation tự tổ chức."
+  },
+  "code-review": {
+    "plain": "Skill này review toàn bộ thay đổi từ một fixed point theo hai trục độc lập: code có theo chuẩn repository không, và nó có làm đúng spec không.",
+    "analogy": "Giống hai reviewer nhìn cùng một diff bằng hai câu hỏi khác nhau; code sạch vẫn có thể làm sai sản phẩm.",
+    "flow": [
+      "Xác minh fixed point và merge-base; thu diff gồm tracked WIP, commit và nội dung từng file untracked trong phạm vi.",
+      "Tìm nguồn Standards và nguồn Spec theo thứ tự được quy định.",
+      "Chạy hai review độc lập; Standards dùng quy tắc repo cộng smell heuristic, Spec đối chiếu từng yêu cầu.",
+      "Trình bày finding có mức độ, file/vị trí, trigger và nguồn; không sửa file."
+    ],
+    "example": "Spec cấm ghi bất kỳ payload file nào khi còn conflict. Code có thể đẹp và test qua nhưng ghi file Update trước khi phát hiện Conflict: Standards có thể đạt trong khi Spec thất bại.",
+    "compare": "code-review bắt đầu từ diff. diagnosing-bugs bắt đầu từ triệu chứng. smart-commits tổ chức lịch sử Git sau khi review, không thay thế review.",
+    "remember": "Luôn giữ Standards và Spec riêng; một trục đạt không bù được trục còn lại."
+  },
+  "encode-invariant": {
+    "plain": "Skill này biến một quy tắc kiến trúc, bảo mật, độ tin cậy hoặc chất lượng đã được chấp thuận thành kiểm tra cơ học nhỏ nhất của repository.",
+    "analogy": "Tài liệu nói hàng rào phải ở đâu; validator là cảm biến báo khi ai đó vượt hàng rào. Không có quyết định về hàng rào thì không được tự dựng.",
+    "flow": [
+      "Tìm nguồn authority nói rõ quy tắc bắt buộc và phạm vi của nó.",
+      "Dùng validation owner và command đã có trong repository.",
+      "Thêm diagnostic nêu vi phạm, quy tắc và hành động sửa.",
+      "Chạy positive proof cho trường hợp hợp lệ và negative proof cho vi phạm đại diện; báo đúng mức local, hook, CI hay merge gate."
+    ],
+    "example": "Nếu tài liệu quy định internal/domain không import internal/database, validator phải cho phép import giữa các domain package và cố ý thất bại khi fixture thêm import database.",
+    "compare": "tdd bảo vệ hành vi sản phẩm ở một seam. encode-invariant bảo vệ một quy tắc trên phạm vi đã xác định. Code hiện tại và convention không tự tạo authority.",
+    "remember": "Repository xanh chưa chứng minh validator có tác dụng; negative proof mới cho thấy nó thật sự bắt được vi phạm."
+  },
+  "prompt-leverage": {
+    "plain": "Skill này giữ nguyên ý định của prompt nhưng thêm lượng cấu trúc vừa đủ để agent biết nguồn, phạm vi, đầu ra, validation và điểm dừng.",
+    "analogy": "Giống biến lời nhờ miệng thành một brief có thể giao việc mà không phải đoán những điều quan trọng.",
+    "flow": [
+      "Tìm công việc thực sự và phân loại coding, research, review, writing hay planning.",
+      "Chọn các khối cần thiết: Objective, Context, Work Style, Tool Rules, Output Contract, Verification và Done Criteria.",
+      "Giữ prompt tỷ lệ với độ khó; không biến việc nhỏ thành đặc tả dài.",
+      "Trả prompt nâng cấp, rationale, template hoặc hook spec tùy yêu cầu."
+    ],
+    "example": "“Đọc code rồi tối ưu import” trở thành một prompt nêu rõ import CSV, fixture 100k dòng, phép đo baseline, hành vi phải giữ, phạm vi module và số liệu trước/sau.",
+    "compare": "prompt-leverage dùng khi ý định đã có nhưng cách giao việc yếu. grilling dùng khi chính quyết định bên trong ý tưởng còn chưa được chốt.",
+    "remember": "Một prompt tốt nói thế nào là đúng và thế nào là xong, nhưng không thêm nghi thức không phục vụ độ tin cậy."
+  },
+  "writing-for-agents": {
+    "plain": "Đây là nguyên tắc viết tài liệu mà agent sẽ dùng nhiều lần: pointer phải kích hoạt đúng lúc, thông tin nằm đúng tầng và mỗi bước có tiêu chí hoàn thành rõ.",
+    "analogy": "Giống thiết kế biển chỉ đường: không mang cả cuốn bản đồ trên mọi chuyến đi, nhưng tại mỗi ngã rẽ phải biết chính xác lúc nào và đi đâu.",
+    "flow": [
+      "Xác định hành vi tài liệu phải thay đổi và nguồn authority.",
+      "Thiết kế context pointer gồm nội dung tài liệu và các nhánh kích hoạt thật sự.",
+      "Giữ bước chính trong file, đẩy reference chỉ một nhánh cần ra sau pointer; đặt định nghĩa, rule và caveat cạnh nhau.",
+      "Làm sắc completion criteria, dùng leading words hữu ích và cắt duplication, cache dễ tra, nội dung cũ cùng no-op."
+    ],
+    "example": "Thay “xem deployment docs khi cần” bằng “khi deploy, rollback hoặc kiểm tra production, đọc docs/runbooks/deployment.md trước mọi lệnh vận hành”. Pointer mới có trigger quan sát được.",
+    "compare": "prompt-leverage nâng một yêu cầu dùng một lần. writing-for-agents thiết kế chỉ dẫn bền vững. Khi viết SKILL.md, nó còn quyết định model-invoked, user-invoked và router.",
+    "remember": "Mỗi dòng luôn được nạp phải kiếm được chỗ của nó. Hướng dẫn tốt giúp agent tìm đúng thông tin đúng lúc, không cố chứa mọi thứ."
+  },
+  "to-questionnaire": {
+    "plain": "Skill này biến phần kiến thức bạn không có nhưng một người khác nắm giữ thành bảng hỏi Markdown có thể gửi bất đồng bộ hoặc dùng trong cuộc họp.",
+    "analogy": "Giống chuẩn bị một cuộc phỏng vấn chuyên gia: bạn không trả lời thay họ; bạn làm rõ điều gì cần nhận lại để ra quyết định.",
+    "flow": [
+      "Hỏi bạn người nhận là ai, biết gì và có quan hệ gì với vấn đề.",
+      "Hỏi bạn sau khi nhận câu trả lời cần quyết định hoặc làm được điều gì.",
+      "Soạn câu quan trọng trước, mỗi câu một ý, có answer stub và giải thích “vì sao” khi dễ bị hiểu sai.",
+      "Lưu to-questionnaire-\u003cslug>.md; người dùng tự gửi hoặc cùng người nhận điền."
+    ],
+    "example": "Để chốt disaster recovery, bảng hỏi gửi trưởng vận hành về thời gian gián đoạn, mất dữ liệu, luồng ưu tiên, quyền failover và lịch diễn tập. Ngôn ngữ được điều chỉnh cho người nhận, không ép họ biết jargon kiến trúc.",
+    "compare": "grilling hỏi chính người dùng để chốt quyết định của họ. to-questionnaire soạn câu hỏi cho người thứ ba đang giữ thông tin mà người dùng thiếu.",
+    "remember": "Grill the send, not the subject: hỏi người dùng về người nhận và kết quả cần có, không bắt họ trả lời điều họ đã nói là không biết."
+  },
+  "handoff": {
+    "plain": "Skill này nén trạng thái công việc thành tài liệu để một phiên agent mới tiếp tục đúng mục tiêu mà không cần mang toàn bộ hội thoại cũ.",
+    "analogy": "Giống bàn giao ca: người sau cần trạng thái, quyết định, bằng chứng và bước tiếp theo, không cần bản chép lời của cả ngày.",
+    "flow": [
+      "Xác định mục tiêu phiên sau, trạng thái thực tế và các quyết định còn hiệu lực.",
+      "Trỏ tới plan, spec, ADR, commit, diff và artifact đang sở hữu nội dung; không sao chép chúng.",
+      "Ghi validation đã chạy, phần chưa xác minh, thay đổi ngoài phạm vi và suggested skills.",
+      "Che secret rồi lưu tài liệu trong thư mục tạm của hệ điều hành."
+    ],
+    "example": "Một handoff cho bug update ghi test tập trung đã qua, full suite chưa chạy vì thiếu Go, plan và file cần đọc, cùng yêu cầu giữ nguyên skills-guide.html.",
+    "compare": "Plan là trạng thái bền vững trong repository cho công việc dài. Handoff là chỉ đường ngắn hạn giữa hai phiên và nằm trong thư mục tạm.",
+    "remember": "Handoff tối ưu cho hành động tiếp theo; nó không phải bản sao của mọi artifact đã tồn tại."
+  },
+  "wait-what": {
+    "plain": "Đây là lệnh yêu cầu agent trình bày lại thông điệp vừa rồi khi nó không truyền đạt được, với bối cảnh vừa đủ và ngôn ngữ kỹ thuật đơn giản.",
+    "analogy": "Giống nói “dừng lại, quay lại một bước và giải thích bằng ví dụ cụ thể”.",
+    "flow": [
+      "Xác định chính xác phần vừa không rõ và chủ thể đang được nói tới.",
+      "Khôi phục bối cảnh trực tiếp, tránh bắt đầu giữa một chuỗi suy luận.",
+      "Dùng câu ngắn, một từ cho một khái niệm và glossary trong CONTEXT.md.",
+      "Giữ nội dung cần hiểu nhưng thay cách trình bày; không tự đổi quyết định hay sửa code."
+    ],
+    "example": "Câu “đặt seam ở persistence boundary để tăng locality” được nói lại thành: Order chỉ yêu cầu chức năng lưu; PostgreSQL thực hiện chức năng đó ở ngoài; test thay nó bằng bộ nhớ nên không cần database.",
+    "compare": "wait-what sửa một lời giải thích vừa thất bại. teach xây cả chương trình học. prompt-leverage cải thiện yêu cầu trước khi công việc bắt đầu.",
+    "remember": "Nếu muốn tiếng Việt, hãy nói rõ; skill gốc mặc định yêu cầu Simplified Technical English."
+  },
+  "teach": {
+    "plain": "Skill này biến thư mục hiện tại thành workspace học tập qua nhiều phiên, xoay quanh mission, bài học HTML ngắn, thực hành có phản hồi và hồ sơ tiến bộ.",
+    "analogy": "Giống một khóa học cá nhân có giáo án sống: bài sau dựa trên mục tiêu và điều bạn thật sự nhớ được từ bài trước.",
+    "flow": [
+      "Làm rõ lý do học và tiêu chí thành công trong MISSION.md.",
+      "Thu thập nguồn đáng tin vào RESOURCES.md; đọc learning-records và NOTES để xác định trình độ.",
+      "Tạo một lesson HTML nhỏ trong vùng vừa sức, có practice và feedback; tái dùng assets chung.",
+      "Ghi insight vào learning-records, tạo reference cô đọng và chọn bài tiếp theo bằng tiến bộ quan sát được."
+    ],
+    "example": "Mission là tự thiết kế module Go dễ test. Bài đầu phân biệt interface/implementation, bài sau tìm seam trong target.Build, rồi một retrieval exercise yêu cầu tự giải thích lại sau thời gian giãn cách.",
+    "compare": "research thu thập tri thức. teach biến tri thức thành khả năng nhớ và làm. wait-what chỉ giải thích lại một điểm ngay lúc đó.",
+    "remember": "Cảm giác quen khi vừa đọc là fluency; mục tiêu là storage strength: có thể tự nhớ và áp dụng trong tình huống mới."
+  },
+  "smart-commits": {
+    "plain": "Skill này đọc toàn bộ working tree và chia công việc đã tồn tại thành commit theo ý định, thay vì theo loại file hoặc bằng một lệnh git add chung.",
+    "analogy": "Giống đóng từng thay đổi vào một hộp có nhãn: mỗi hộp kể trọn một lý do và có bằng chứng đi kèm.",
+    "flow": [
+      "Đọc staged, unstaged, untracked, deleted và renamed cùng trạng thái branch/remote.",
+      "Hiểu từng diff, nhóm code với test trực tiếp chứng minh cùng hành vi; tách tài liệu khi nó có mục đích độc lập.",
+      "Chạy quality gate phù hợp, stage chính xác file hoặc hunk và commit từng nhóm.",
+      "Kiểm tra trạng thái sau mỗi commit; chỉ push nếu yêu cầu của lần gọi nói rõ push."
+    ],
+    "example": "Bản sửa update.go và update_test.go thành commit fix(update); README giải thích hành vi có thể đi cùng nếu là một phần contract, còn prototype-dashboard.html ngoài phạm vi được giữ nguyên.",
+    "compare": "implement tạo công việc mới và có thể commit ở cuối. smart-commits chỉ tổ chức công việc đã có, không sửa product code để việc commit dễ hơn.",
+    "remember": "Commit và push là hai hành động khác nhau. “Commit mọi thứ” chưa cấp quyền push."
+  },
+  "resolving-merge-conflicts": {
+    "plain": "Skill này hoàn tất một merge hoặc rebase đang conflict bằng cách phục hồi ý định của hai phía, không chỉ chọn đoạn trái hoặc phải.",
+    "analogy": "Giống biên tập hai bản sửa của cùng tài liệu: cần hiểu vì sao mỗi tác giả thay đổi rồi tạo một bản cuối nhất quán.",
+    "flow": [
+      "Đọc trạng thái merge/rebase, commit đang áp dụng, conflict và pre-existing dirt.",
+      "Tìm ý định trong commit, spec, issue, ADR, test và code gọi; phân biệt hai thay đổi tương thích, thay thế hay xung đột policy.",
+      "Giải từng hunk và cả conflict ngữ nghĩa Git không đánh dấu; giữ thay đổi không liên quan.",
+      "Chạy typecheck/test/format phù hợp, stage đúng phạm vi và tiếp tục cho tới khi merge hoặc toàn bộ rebase hoàn tất."
+    ],
+    "example": "Main đổi retry mặc định từ 3 lên 5, nhánh feature đưa retry vào config. Kết quả có thể giữ config với default 5 nếu nguồn chứng minh cả hai ý định; không đơn giản chọn một bên.",
+    "compare": "smart-commits làm việc với working tree bình thường. resolving-merge-conflicts xử lý tiến trình Git đang dở và theo skill hướng tới hoàn tất, không abort.",
+    "remember": "Xóa conflict marker chưa chứng minh kết hợp đúng; build và test phải phát hiện cả những mâu thuẫn nằm ở các file khác nhau."
+  },
+  "find-skills": {
+    "plain": "Skill này tìm gói hướng dẫn bên ngoài cho một khả năng chưa có, rồi kiểm tra nguồn và nội dung trước khi đề xuất cài.",
+    "analogy": "Giống chọn dependency: kết quả tìm kiếm là danh sách ứng viên, không phải bằng chứng nên đưa ngay vào dự án.",
+    "flow": [
+      "Làm rõ domain, nhiệm vụ cụ thể và phạm vi cài đặt.",
+      "Tìm leaderboard hoặc Skills CLI bằng từ khóa đủ cụ thể.",
+      "Đọc skill; xem tác giả, mức sử dụng, repository, bảo trì, script, quyền và độ phù hợp với stack.",
+      "Trình bày tối đa vài lựa chọn với lệnh cài và giới hạn; chỉ cài khi người dùng yêu cầu."
+    ],
+    "example": "Với React accessibility, agent so sánh skill từ tổ chức chính thức với một repository mới có script tải binary không rõ nguồn. Lượt cài cao là tín hiệu, nhưng nội dung và quyền mới quyết định khuyến nghị.",
+    "compare": "research tìm câu trả lời hoặc phương án kỹ thuật. find-skills tìm một quy trình có thể mở rộng hành vi của agent.",
+    "remember": "Đừng cài từ trang kết quả. Hãy đọc SKILL.md và script như đọc code của một dependency."
+  },
+  "herdr": {
+    "plain": "Skill này điều khiển Herdr, công cụ tổ chức terminal thành workspace, tab và pane, đồng thời nhận diện coding agent đang chạy trong pane.",
+    "analogy": "Giống phòng điều khiển cho nhiều terminal: pane là màn hình, agent là người đang làm việc trong một màn hình.",
+    "flow": [
+      "Chỉ kích hoạt khi người dùng nhắc Herdr; xác minh HERDR_ENV=1.",
+      "Đọc help của binary đang cài, lấy ID và trạng thái thật thay vì đoán.",
+      "Dùng pane cho terminal/process thường, agent cho coding agent được nhận diện; thực hiện đúng thao tác đã yêu cầu.",
+      "Đọc output và artifact để xác nhận kết quả, vì idle/done chỉ là trạng thái vòng đời."
+    ],
+    "example": "Người dùng yêu cầu xem update-reviewer. Agent tìm pane theo tên, thấy done, đọc output cuối và kiểm tra file/test mà agent kia báo; nó không kết luận nhiệm vụ đúng chỉ từ chữ done.",
+    "compare": "handoff chuyển ngữ cảnh sang phiên sau. herdr quan sát hoặc điều khiển các phiên đang chạy. Tạo pane và start agent là hai thao tác riêng.",
+    "remember": "Nếu không ở trong Herdr thì dừng. Trạng thái done không phải bằng chứng code đúng."
+  },
+  "tldraw-api": {
+    "plain": "Skill này thao tác tài liệu tldraw Desktop qua API localhost như dữ liệu có cấu trúc, rồi xác minh cả shape/binding lẫn bố cục nhìn thấy.",
+    "analogy": "Thay vì kéo thả bằng chuột, agent làm việc như một editor có mô hình đối tượng: mỗi hộp, mũi tên và liên kết có ID rõ.",
+    "flow": [
+      "Yêu cầu tldraw Desktop đang chạy với tài liệu mở; liệt kê docs và lấy ID thật.",
+      "Đọc shapes và bindings trước khi sửa; giữ các đối tượng ngoài phạm vi.",
+      "Thực hiện mutation qua exec hoặc script-workspace với semantic ID có thể chạy lại.",
+      "Save qua tldraw, sau đó kiểm tra shapes, bindings, lint và screenshot."
+    ],
+    "example": "Để thêm luồng mustang CLI → target.Build → install.Init, agent tạo các shape có ID ổn định, bind connector thật, căn vị trí, save rồi dùng screenshot để bắt chồng chéo.",
+    "compare": "Mermaid phù hợp sơ đồ nhỏ trong tài liệu. tldraw-api phù hợp canvas .tldraw cần chỉnh, lưu và tiếp tục biên tập. Không sửa archive đang mở trực tiếp.",
+    "remember": "exec thay editor sống và làm file dirty; save mới ghi xuống file. Hình nhìn đúng chưa chắc connector đã được binding."
+  },
+  "wizard": {
+    "plain": "Skill này tạo script Bash tương tác để dẫn con người qua những bước chỉ họ có thể làm như đăng nhập, MFA, tạo secret hoặc xác nhận cutover.",
+    "analogy": "Đây là checklist biết mở đúng trang, hỏi đúng giá trị và ghi nó đúng nơi, đồng thời dừng ở các cổng cần phán đoán của con người.",
+    "flow": [
+      "Đọc .env, README, CI và runbook để lập đủ stage, giá trị, nguồn lấy, đích ghi và độ nhạy cảm.",
+      "Trình danh sách stage cho người dùng chốt trước khi author script.",
+      "Sao chép template.sh; chỉ viết phần stage bằng open_url, ask_secret, write_env, set_secret, confirm và helper sẵn có.",
+      "Chạy bash -n, shellcheck nếu có và trace tĩnh; không tự chạy end-to-end."
+    ],
+    "example": "Wizard Stripe mở trang API Keys, nhập ẩn STRIPE_SECRET_KEY, ghi .env.local và GitHub secret; sau đó tạo webhook và kiểm tra tên secret khớp chính xác workflow.",
+    "compare": "Automation làm thay con người. Wizard phối hợp với con người tại bước agent không thể làm. to-questionnaire lấy kiến thức; wizard dẫn thao tác.",
+    "remember": "Đường dẫn dashboard và tên nút phải có nguồn hiện hành. Không bịa UI và không chạy hết script khi nó cần tài khoản thật."
+  },
+  "improve-harness": {
+    "plain": "Skill này cải thiện chính hướng dẫn, công cụ hoặc validation dành cho agent bằng một thử nghiệm có baseline và fresh rerun, thay vì dựa trên cảm giác tài liệu mới “có vẻ hay hơn”.",
+    "analogy": "Giống A/B test nhỏ cho cách agent làm việc: giữ bài toán tương đương, thay một yếu tố, rồi quan sát hành vi phiên mới.",
+    "flow": [
+      "Ghi baseline từ một trajectory đã quan sát: task, failure, human intervention, revision, tools, authority và proof.",
+      "Tìm khoảng trống sớm nhất thuộc context, capability, domain ownership, authority, proof hay environment; gán đúng owner.",
+      "Nêu giả thuyết và áp dụng một can thiệp nhỏ, có maintenance owner cùng removal condition; chạy native validation.",
+      "Cho agent mới làm nhiệm vụ tương đương; ghi available, retrieved, relevant rồi quyết định keep, revise, remove hoặc pending fresh rerun."
+    ],
+    "example": "Agent bỏ lỡ hướng dẫn Windows và người dùng phải chỉ dev-shell.ps1. Can thiệp nhỏ là làm rõ pointer trong AGENTS.md. Chỉ khi phiên mới tự mở tài liệu và chạy setup đúng mới có cơ sở Keep.",
+    "compare": "writing-for-agents chỉ cách viết. encode-invariant cơ khí hóa rule đã có. improve-harness kiểm tra một thay đổi có thật sự cải thiện hành vi agent trên công việc đại diện hay không.",
+    "remember": "Chỉ dùng khi người dùng gọi rõ $improve-harness. Không có baseline thì chỉ có đề xuất thử nghiệm; không có fresh rerun thì chưa được tuyên bố cải thiện."
+  }
+}
+</script>
+<script>
+'use strict';
+const skills=JSON.parse(document.getElementById('skill-data').textContent);
+const deepDives=JSON.parse(document.getElementById('deep-dive-data').textContent);
+const groups={
+understand:{label:'Hiểu & xác định vấn đề',color:'#36718a',tint:'#eaf4fa',icon:'compass'},
+design:{label:'Thiết kế & thử nghiệm',color:'#936723',tint:'#fbf2df',icon:'grid'},
+build:{label:'Code & kiểm chứng',color:'#397746',tint:'#edf5e8',icon:'terminal'},
+collaborate:{label:'Giao tiếp & tri thức',color:'#a7546c',tint:'#faedf1',icon:'book'},
+operate:{label:'Công cụ & vận hành',color:'#596d7e',tint:'#edf1f5',icon:'route'},
+harness:{label:'Chất lượng Harness',color:'#af5b41',tint:'#fbede7',icon:'compass'}
+};
+const recipes=[
+['Vừa nhận một repository cũ','Khảo sát trước. Khi có đề xuất tài liệu cần áp dụng, dùng một phiên độc lập kiểm tra bằng chứng.',['onboard-repository','audit-onboarding-proposal']],
+['Có ý tưởng nhưng chưa chốt yêu cầu','Làm rõ lựa chọn và thuật ngữ. Dùng bản mẫu cho câu hỏi cần trải nghiệm trước khi đưa vào spec.',['grill-with-docs','prototype','implement']],
+['Một lỗi đang làm người dùng gặp khó khăn','Tái hiện và tìm nguyên nhân. Khi phạm vi sửa đã rõ, bảo vệ hành vi bằng test phù hợp rồi review bản sửa.',['diagnosing-bugs','tdd','code-review']],
+['Code chạy được nhưng mỗi lần đổi đều khó','Tìm khu vực đáng cải tổ, chọn ứng viên, rồi thiết kế interface và kiểm chứng phương án trước khi sửa.',['improve-codebase-architecture','codebase-design','grilling']],
+['Sắp bàn giao hoặc kết thúc phần việc','Review trước; commit thay đổi thuộc phạm vi, rồi chuyển ngữ cảnh và phần chưa xong sang phiên sau.',['code-review','smart-commits','handoff']],
+['Agent cứ lặp lại cùng một điểm vướng','Dùng baseline đã quan sát để thử một cải tiến. Nếu có quy tắc đã chấp thuận cần thực thi, encode-invariant có thể là bước cụ thể trong thử nghiệm.',['improve-harness','writing-for-agents','encode-invariant']]
+];
+const $=selector=>document.querySelector(selector);
+const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const icon=name=>'<svg class="icon" aria-hidden="true"><use href="#i-'+name+'"/></svg>';
+const normalize=value=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase();
+const list=$('#skill-list');
+Object.entries(groups).forEach(([key,group])=>{const option=document.createElement('option');option.value=key;option.textContent=group.label;$('#category').append(option);});
+list.innerHTML=skills.map((s,i)=>{const d=deepDives[s.id],prev=skills[i-1],next=skills[i+1];return '<details class="skill" id="skill-'+s.id+'" data-skill="'+s.id+'" style="--group-color:'+groups[s.group].color+';--group-tint:'+groups[s.group].tint+'">'+
+'<summary><span class="skill-symbol" aria-hidden="true">'+icon(groups[s.group].icon)+'</span><span><span class="skill-kind">'+esc(groups[s.group].label)+'</span><span class="skill-name">'+s.id+'</span><span class="skill-subtitle">'+esc(s.title)+'</span></span><span class="summary-end"><span class="skill-index">'+String(i+1).padStart(2,'0')+'</span><span class="chevron">'+icon('down')+'</span></span></summary>'+
+'<div class="skill-detail"><p class="skill-lead">'+esc(s.about)+'</p><span class="mode">'+(s.explicit?'Gọi đích danh':'Theo ngữ cảnh hoặc gọi tên')+'</span>'+
+'<section class="deep-dive" aria-label="Giải thích chi tiết"><div class="deep-heading"><h4>Hiểu skill này từ gốc</h4><span class="chapter-count">CHƯƠNG '+String(i+1).padStart(2,'0')+' / '+skills.length+'</span></div>'+
+'<div class="deep-opening"><div><h5>Nó thật sự là gì?</h5><p>'+esc(d.plain)+'</p></div><p class="analogy">'+esc(d.analogy)+'</p></div>'+
+'<div class="deep-layout"><div class="deep-panel"><h5>Nó hoạt động như thế nào?</h5><ol class="deep-flow">'+d.flow.map(step=>'<li>'+esc(step)+'</li>').join('')+'</ol></div><div class="deep-panel example"><h5>Ví dụ thực tế</h5><p>'+esc(d.example)+'</p></div></div>'+
+'<div class="deep-compare"><div class="deep-panel"><h5>Dễ nhầm với skill nào?</h5><p>'+esc(d.compare)+'</p></div><div class="deep-panel remember"><h5>Một câu để nhớ</h5><p>'+esc(d.remember)+'</p></div></div></section>'+
+'<div class="quick-heading">Cách dùng trong một nhiệm vụ</div>'+
+'<div class="detail-grid"><div><h4>Khi nào dùng</h4><p>'+esc(s.when)+'</p></div><div><h4>Cần cung cấp</h4><p>'+esc(s.input)+'</p></div><div><h4>Cách thực hiện</h4><ol>'+s.steps.map(step=>'<li>'+esc(step)+'</li>').join('')+'</ol></div><div><h4>Kết quả mong đợi</h4><p>'+esc(s.output)+'</p></div></div>'+
+'<p class="detail-note"><strong>Điểm cần biết.</strong> '+esc(s.note)+'</p><div class="prompt"><div class="prompt-label">Prompt mẫu</div><pre id="prompt-'+s.id+'">'+esc(s.prompt)+'</pre><button type="button" class="icon-button copy" data-copy="'+s.id+'" aria-label="Sao chép prompt '+s.id+'" title="Sao chép prompt">'+icon('copy')+'</button></div>'+
+'<div class="detail-links"><a href=".agents/skills/'+s.id+'/SKILL.md">'+icon('link')+'Đọc SKILL.md gốc</a>'+s.related.map(id=>'<a href="#skill-'+id+'">'+esc(id)+'</a>').join('')+'</div>'+
+'<nav class="chapter-nav" aria-label="Điều hướng giữa các skill">'+(prev?'<a href="#skill-'+prev.id+'"><svg class="icon" style="transform:rotate(180deg)"><use href="#i-arrow"/></svg><span>Skill trước<strong>'+esc(prev.id)+'</strong></span></a>':'')+(next?'<a href="#skill-'+next.id+'"><span>Skill tiếp theo<strong>'+esc(next.id)+'</strong></span>'+icon('arrow')+'</a>':'<a href="#overview"><span>Đã đọc hết<strong>Về đầu cẩm nang</strong></span>'+icon('arrow')+'</a>')+'</nav></div></details>'}).join('');
+$('#recipe-list').innerHTML=recipes.map((r,i)=>'<article class="recipe"><span class="recipe-num">'+String(i+1).padStart(2,'0')+'</span><div><h3>'+esc(r[0])+'</h3><p>'+esc(r[1])+'</p><div class="chain">'+r[2].map(id=>'<a href="#skill-'+id+'">'+esc(id)+'</a>').join(icon('arrow'))+'</div></div></article>').join('');
+const skillNodes=[...list.querySelectorAll('details')];
+const searchable=skills.map(s=>normalize([s.id,s.title,s.about,s.when,s.input,s.output,s.note,...s.steps,groups[s.group].label].join(' ')));
+function updateExpand(){
+const visible=skillNodes.filter(n=>!n.hidden),allOpen=visible.length>0&&visible.every(n=>n.open);
+const label=allOpen?'Thu gọn tất cả kết quả':'Mở tất cả kết quả';
+$('#expand').title=label;$('#expand').setAttribute('aria-label',label);$('#expand').disabled=!visible.length;
+}
+function filter(){
+const words=normalize($('#search').value.trim()).split(/\s+/).filter(Boolean),group=$('#category').value,mode=$('#mode').value;
+let count=0;
+skills.forEach((s,i)=>{const match=words.every(w=>searchable[i].includes(w))&&(group==='all'||s.group===group)&&(mode==='all'||(mode==='explicit'?!!s.explicit:!s.explicit));skillNodes[i].hidden=!match;if(match)count++;});
+$('#result-count').textContent=count+' / '+skills.length+' skill';$('#empty').hidden=count!==0;$('#reset').hidden=!words.length&&group==='all'&&mode==='all';updateExpand();
+}
+function resetFilters(){$('#search').value='';$('#category').value='all';$('#mode').value='all';filter();}
+$('#search').addEventListener('input',filter);
+$('#category').addEventListener('change',filter);
+$('#mode').addEventListener('change',filter);
+$('#reset').addEventListener('click',resetFilters);
+$('#empty-reset').addEventListener('click',()=>{resetFilters();$('#search').focus();});
+$('#expand').addEventListener('click',()=>{const visible=skillNodes.filter(n=>!n.hidden),open=!visible.every(n=>n.open);visible.forEach(n=>n.open=open);updateExpand();});
+skillNodes.forEach(n=>n.addEventListener('toggle',updateExpand));
+let toastTimer;
+function toast(message){clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').hidden=false;toastTimer=setTimeout(()=>$('#toast').hidden=true,3500);}
+async function copyPrompt(id){
+const s=skills.find(s=>s.id===id);if(!s)return;
+try{
+if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');
+await navigator.clipboard.writeText(s.prompt);toast('Đã sao chép prompt của '+id);return;
+}catch(error){
+// file:// clipboard support varies; keep a selection fallback on the visible prompt.
+const node=document.getElementById('prompt-'+id),range=document.createRange();range.selectNodeContents(node);
+const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+try{if(document.execCommand('copy')){selection.removeAllRanges();toast('Đã sao chép prompt của '+id);return;}}catch(ignored){}
+toast('Trình duyệt chặn sao chép. Prompt đã được chọn để bạn sao chép thủ công.');
+}
+}
+list.addEventListener('click',event=>{const button=event.target.closest('[data-copy]');if(button)copyPrompt(button.dataset.copy);});
+function revealHash(){
+const id=location.hash.slice(1);if(!id.startsWith('skill-'))return;
+const node=document.getElementById(id);if(!node?.classList.contains('skill'))return;
+if(node.hidden)resetFilters();node.open=true;requestAnimationFrame(()=>node.scrollIntoView({block:'start'}));
+}
+window.addEventListener('hashchange',revealHash);
+document.addEventListener('click',event=>{
+const anchor=event.target.closest('a[href^="#skill-"]');if(!anchor)return;
+if(anchor.closest('.chapter-nav')){
+  const target=document.querySelector(anchor.hash);
+  if(target?.classList.contains('skill')){
+    if(target.hidden)resetFilters();
+    skillNodes.forEach(node=>node.open=node===target);
+  }
+}
+if(anchor.hash===location.hash)revealHash();
+});
+$('#print').addEventListener('click',()=>window.print());
+let printState;
+window.addEventListener('beforeprint',()=>{if(!printState)printState=skillNodes.map(n=>({open:n.open,hidden:n.hidden}));skillNodes.forEach(n=>{n.open=true;n.hidden=false;});drawWorkflow();});
+window.addEventListener('afterprint',()=>{if(printState)skillNodes.forEach((n,i)=>{n.open=printState[i].open;n.hidden=printState[i].hidden;});printState=null;updateExpand();drawWorkflow();});
+const navLinks=[...document.querySelectorAll('.nav a')],sections=navLinks.map(a=>document.querySelector(a.getAttribute('href')));
+let scrollPending=false;
+function activeSection(){
+let current=sections[0];for(const section of sections){if(section.getBoundingClientRect().top<150)current=section;}
+navLinks.forEach(a=>{if(a.hash==='#'+current.id)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});scrollPending=false;
+}
+window.addEventListener('scroll',()=>{if(!scrollPending){scrollPending=true;requestAnimationFrame(activeSection);}},{passive:true});
+function drawWorkflow(){
+const canvas=$('#workflow-canvas'),ctx=canvas.getContext('2d');if(!ctx)return;
+const w=canvas.clientWidth,h=canvas.clientHeight,dpr=window.devicePixelRatio||1;
+canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);
+const small=w<560,cols=small?2:4,cell=w/cols;
+const labels=['Đọc căn cứ','Chọn cách làm','Thực hiện','Kiểm chứng'];
+const sub=['Repository','Skill phù hợp','Phạm vi đã chốt','Bằng chứng thật'];
+const colors=['#b9d7e8','#edcf9a','#cde7a9','#f0b5a4'];
+for(let i=0;i<4;i++){
+  const x=(i%cols)*cell+2,y=small?Math.floor(i/cols)*94+21:22;
+  ctx.fillStyle=colors[i];ctx.fillRect(x,y,23,23);
+  ctx.font='600 10px Consolas,monospace';ctx.fillStyle='#25312a';ctx.fillText('0'+(i+1),x+5,y+15);
+  ctx.font='500 14px Segoe UI,Arial';ctx.fillStyle='#f5f8ed';
+  // Narrow columns place labels below the index to keep every word legible.
+  const compact=cell<180;
+  ctx.fillText(labels[i],compact?x:x+33,compact?y+45:y+16);
+  ctx.font='11px Segoe UI,Arial';ctx.fillStyle='#adbbb1';
+  ctx.fillText(sub[i],compact?x:x+33,compact?y+64:y+38);
+  if(i%cols<cols-1){
+    const ax=x+cell-18,ay=y+11;
+    ctx.strokeStyle='#82957f';ctx.lineWidth=1;ctx.beginPath();
+    ctx.moveTo(ax-15,ay);ctx.lineTo(ax,ay);ctx.lineTo(ax-4,ay-4);
+    ctx.moveTo(ax,ay);ctx.lineTo(ax-4,ay+4);ctx.stroke();
+  }
+}
+if(!small){
+  const y=108;
+  ctx.strokeStyle='#53674f';ctx.lineWidth=1;ctx.setLineDash([2,4]);ctx.beginPath();
+  ctx.moveTo(w-12,y-13);ctx.lineTo(w-12,y);ctx.lineTo(2,y);ctx.lineTo(2,y-13);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#252e29';ctx.fillRect(w/2-112,y-8,224,18);
+  ctx.fillStyle='#acc097';ctx.font='10px Segoe UI,Arial';ctx.textAlign='center';
+  ctx.fillText('Giữ tri thức bền vững trong repository',w/2,y+4);ctx.textAlign='left';
+}
+}
+new ResizeObserver(drawWorkflow).observe($('#workflow-canvas'));
+filter();revealHash();activeSection();drawWorkflow();
+</script>
+</body>
+</html>
