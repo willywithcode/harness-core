@@ -968,6 +968,26 @@ Phạm vi hiện tại: chỉ chẩn đoán.</pre>
     ]
   },
   {
+    "id": "spl",
+    "group": "operate",
+    "title": "Phối hợp Lead, Peer và Supervisor trong phòng SPL",
+    "about": "Làm việc theo giao thức của phòng SPL: Lead giao việc có phạm vi, Peer báo cáo kèm bằng chứng, Supervisor xem xét cách giao tiếp.",
+    "when": "Agent đang chạy trong phòng do `spl up` tạo (SPL_ROOM đã đặt) hoặc nhận tin bắt đầu bằng [SPL brief/handback/reply/alert.",
+    "input": "Lệnh `spl` trên PATH, phiên nằm trong pane thuộc phòng SPL.",
+    "steps": [
+      "Xác nhận thành viên bằng spl whoami; không phải thành viên thì dừng.",
+      "Chạy spl guide để lấy nghĩa vụ và lệnh của vai mình.",
+      "Chỉ nhắn qua spl send/handback/reply; Lead giữ plan trong docs/plans/active/ khi việc kéo dài."
+    ],
+    "output": "Tin nhắn được ghi log và chuyển đúng người; handback có kết quả, thay đổi, bằng chứng và rủi ro.",
+    "note": "Không dùng skill herdr để nhắn cho thành viên trong phòng. Log phòng nằm ở ~/.spl, không đưa vào repository.",
+    "prompt": "Bạn đang ở phòng SPL. Dùng skill spl: chạy spl whoami và spl guide rồi chờ brief.",
+    "related": [
+      "herdr",
+      "handoff"
+    ]
+  },
+  {
     "id": "tldraw-api",
     "group": "operate",
     "title": "Vẽ và kiểm chứng sơ đồ trong tldraw",
@@ -1354,6 +1374,19 @@ Phạm vi hiện tại: chỉ chẩn đoán.</pre>
     "example": "Người dùng yêu cầu xem update-reviewer. Agent tìm pane theo tên, thấy done, đọc output cuối và kiểm tra file/test mà agent kia báo; nó không kết luận nhiệm vụ đúng chỉ từ chữ done.",
     "compare": "handoff chuyển ngữ cảnh sang phiên sau. herdr quan sát hoặc điều khiển các phiên đang chạy. Tạo pane và start agent là hai thao tác riêng.",
     "remember": "Nếu không ở trong Herdr thì dừng. Trạng thái done không phải bằng chứng code đúng."
+  },
+  "spl": {
+    "plain": "Skill này giúp agent làm đúng vai trong phòng SPL: nhận brief, báo cáo và xử lý handback qua lệnh spl thay vì nhắn thẳng vào terminal của nhau.",
+    "analogy": "Giống một phòng họp có thư ký: mọi lời giao việc và báo cáo đều qua thư ký ghi biên bản trước khi chuyển tới người nhận.",
+    "flow": [
+      "Kích hoạt khi SPL_ROOM được đặt hoặc tin nhắn bắt đầu bằng [SPL.",
+      "spl whoami xác nhận vai; spl guide là nguồn luật duy nhất cho vai đó.",
+      "Mọi trao đổi qua spl send, spl handback, spl reply; spl status và spl log để xem lại.",
+      "Handback theo Completion Standard: kết quả, thay đổi, bằng chứng, rủi ro còn lại."
+    ],
+    "example": "Lead giao p1 sửa lỗi đăng nhập qua spl send kèm phạm vi và bằng chứng cần nộp. p1 báo cáo bằng spl handback với lệnh test đã chạy; Lead trả lời chấp nhận qua spl reply.",
+    "compare": "herdr điều khiển pane và agent nói chung. spl là giao thức giao tiếp riêng trong phòng Lead/Peer/Supervisor và không cho nhắn tắt qua herdr.",
+    "remember": "Tin nhắn không qua spl thì phòng và Supervisor không nhìn thấy."
   },
   "tldraw-api": {
     "plain": "Skill này thao tác tài liệu tldraw Desktop qua API localhost như dữ liệu có cấu trúc, rồi xác minh cả shape/binding lẫn bố cục nhìn thấy.",
