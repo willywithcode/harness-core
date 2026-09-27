@@ -23,7 +23,8 @@ repository and delivers it to the target seat's pane.
   `herdr agent prompt` or pane input to talk to them: those messages bypass
   the ledger, the watch and the team's authority.
 - Run each `slp` command on its own (no `&&`, `;` or pipes): slp commands run
-  without asking, anything else waits for the Human's approval.
+  without asking; anything else your role may do waits for approval (the
+  Supervisor answers for the Human unless the Human is in the loop).
 - The team's state stays in `~/.slp`. Never copy letters, the ledger or the
   concept into the repository or create parallel task records for them.
 - The Human's concept is read with `slp context`; only the Supervisor
@@ -35,3 +36,15 @@ repository and delivers it to the target seat's pane.
   unresolved risks. Never report unverified work as complete.
 - Letters from `slp` itself (NOTICE, INCIDENT, NUDGE) are readings of the
   record, not orders or verdicts: check the record, then act.
+
+## Other Skills In The Team
+
+- `slp guide` lists the repository's skills your role reaches for and the
+  ones no seat uses. Follow that list: `herdr`, `handoff`, `implement` and
+  `smart-commits` do slp's own job, and slp does it here.
+- A skill's steps give way to your role where they differ. The Supervisor
+  and Leads write no files: repository docs, ADRs and durable plans in
+  `docs/plans/active/` are a Peer's task, briefed by a Lead. The Human's
+  settled concept lives in `slp context`, not in a repository CONTEXT.md.
+- A Lead may name skills in a brief (`slp start-task --skill tdd`); a Peer
+  uses the ones its brief names.
