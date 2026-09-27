@@ -26,7 +26,10 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
+          # Newer macOS rejects binaries from older Go linkers (dyld: missing
+          # LC_UUID); build and test with the current stable Go. go.mod keeps
+          # 1.22 as the minimum.
+          go-version: "stable"
 
       - run: go vet ./...
       - run: go test ./...
@@ -52,7 +55,10 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
+          # Newer macOS rejects binaries from older Go linkers (dyld: missing
+          # LC_UUID); build and test with the current stable Go. go.mod keeps
+          # 1.22 as the minimum.
+          go-version: "stable"
 
       - name: Build
         env:

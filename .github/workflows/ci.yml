@@ -1,0 +1,29 @@
+name: CI
+
+# Test every push on each platform a binary is published for, so problems
+# such as the Windows self-update bug or macOS rejecting binaries (dyld:
+# missing LC_UUID) show up before a release is tagged.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+
+      - run: go vet ./...
+      - run: go test ./...
