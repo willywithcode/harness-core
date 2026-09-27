@@ -138,7 +138,8 @@ func TestApply_HappyPath(t *testing.T) {
 	if err != nil {
 		t.Fatalf("stat: %v", err)
 	}
-	if info.Mode()&0o111 == 0 {
+	// Windows has no execute bits; executability comes from the .exe name.
+	if runtime.GOOS != "windows" && info.Mode()&0o111 == 0 {
 		t.Fatalf("replaced executable is not executable: mode %v", info.Mode())
 	}
 }

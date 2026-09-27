@@ -158,7 +158,8 @@ func (c *Client) Apply(plan Plan) error {
 // replaceExecutable writes content to a temp file in exePath's directory,
 // makes it executable, and renames it over exePath. Same-directory rename
 // is atomic on POSIX filesystems and stays on the same filesystem/volume,
-// which a cross-directory move is not guaranteed to do.
+// which a cross-directory move is not guaranteed to do. On Windows, where a
+// running executable cannot be overwritten, see swapRunningExecutable.
 func replaceExecutable(exePath string, content []byte) (err error) {
 	dir := filepath.Dir(exePath)
 
@@ -185,7 +186,41 @@ func replaceExecutable(exePath string, content []byte) (err error) {
 		return err
 	}
 
+	if runtime.GOOS == "windows" {
+		return swapRunningExecutable(tmpPath, exePath)
+	}
 	return os.Rename(tmpPath, exePath)
+}
+
+// swapRunningExecutable replaces exePath on Windows, which refuses to
+// overwrite or delete an executable that is running (this very process) but
+// allows renaming it. The current binary is moved aside to a unique
+// "<exe>.old-*" name, then the new one takes its place; if that fails, the
+// current binary is put back. Moved-aside binaries from earlier updates are
+// removed here once they are no longer running.
+func swapRunningExecutable(tmpPath, exePath string) error {
+	if stale, _ := filepath.Glob(exePath + ".old-*"); len(stale) > 0 {
+		for _, path := range stale {
+			os.Remove(path) // fails harmlessly while that binary still runs
+		}
+	}
+	aside, err := os.CreateTemp(filepath.Dir(exePath), filepath.Base(exePath)+".old-*")
+	if err != nil {
+		return err
+	}
+	asidePath := aside.Name()
+	aside.Close()
+	if err := os.Remove(asidePath); err != nil {
+		return err
+	}
+	if err := os.Rename(exePath, asidePath); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if err := os.Rename(tmpPath, exePath); err != nil {
+		os.Rename(asidePath, exePath) // put the current binary back
+		return err
+	}
+	return nil
 }
 
 func (c *Client) latestRelease() (release, error) {

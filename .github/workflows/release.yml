@@ -14,7 +14,13 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Every platform a binary is published for: the Windows self-update bug
+    # (a running .exe cannot be overwritten) passed a Linux-only test job.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
