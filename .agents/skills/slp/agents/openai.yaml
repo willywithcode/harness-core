@@ -1,0 +1,3 @@
+interface:
+  display_name: "slp"
+  short_description: "Supervisor/Lead/Peer team protocol"
