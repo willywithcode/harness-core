@@ -22,9 +22,15 @@ repository and delivers it to the target seat's pane.
 - Reach other seats only through `slp` verbs. Do not use the `herdr` skill,
   `herdr agent prompt` or pane input to talk to them: those messages bypass
   the ledger, the watch and the team's authority.
-- Run each `slp` command on its own (no `&&`, `;` or pipes): slp commands run
-  without asking; anything else your role may do waits for approval (the
-  Supervisor answers for the Human unless the Human is in the loop).
+- Run each `slp` command on its own (no `&&`, `;` or pipes), and every other
+  command from where you are: never `cd dir; cmd`; use absolute paths,
+  `git -C <dir>` and the Read, Grep and Glob tools.
+- Your role's permissions are set for you (slp v0.4): what you must not do is
+  refused, the rest runs without asking. Never ask anyone for leave to do
+  what your brief covers; ask only about the work (idea, design, technology).
+- A letter from `human` is the Human's own word (`slp tell`); the Supervisor
+  has a copy. Act on it within your brief; a change of outcome or scope goes
+  to whoever briefed you first.
 - The team's state stays in `~/.slp`. Never copy letters, the ledger or the
   concept into the repository or create parallel task records for them.
 - The Human's concept is read with `slp context`; only the Supervisor
